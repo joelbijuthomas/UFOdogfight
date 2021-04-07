@@ -55,7 +55,7 @@ void draw_line(int x0, int y0, int x1, int y1, short int line_color);
 void plot_pixel(int x, int y, short int line_color); 
 void swap(int *x, int *y);
 void wait_for_vsync();
-void keyboard_input();
+void keyboard_input(char *keypressed);
 void draw_UFO(UFO *ufo);
 void update_location_UFO(UFO *ufo, char PS2Data);
 
@@ -89,6 +89,7 @@ int main(void)
 		clear_screen(); 
         /* Erase any boxes and lines that were drawn in the last iteration */
 		
+        keyboard_input(key_pressed_ptr);
         draw_UFO(ufo1_ptr);
         update_location_UFO(ufo1_ptr, key_pressed);
 
