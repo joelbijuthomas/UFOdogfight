@@ -84,7 +84,7 @@ int main(void)
     char key_pressed = 0;
     char *key_pressed_ptr = &key_pressed;
 
-    while (true)
+    while (1)
     {
 		clear_screen(); 
         /* Erase any boxes and lines that were drawn in the last iteration */
@@ -181,10 +181,10 @@ void keyboard_input(char *keypressed){
 }
 
 void draw_UFO(UFO *ufo){
-    plot_pixel(ufo->x, ufo->y, BLUE);
-    plot_pixel(ufo->x + 1 , ufo->y, BLUE);
-    plot_pixel(ufo->x, ufo->y + 1, BLUE);
-    plot_pixel(ufo->x + 1, ufo->x + 1, BLUE);
+    plot_pixel(ufo->x, ufo->y, GREEN);
+    plot_pixel(ufo->x + 1 , ufo->y, GREEN);
+    plot_pixel(ufo->x, ufo->y + 1, GREEN);
+    plot_pixel(ufo->x + 1, ufo->x + 1, GREEN);
 }
 
 void update_location_UFO(UFO *ufo, char PS2Data){
@@ -194,4 +194,5 @@ void update_location_UFO(UFO *ufo, char PS2Data){
     else if(PS2Data == 0x68){
         ufo->dx = -4;
     }
+    ufo->x += ufo->dx;
 }
