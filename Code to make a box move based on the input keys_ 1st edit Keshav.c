@@ -76,11 +76,13 @@ int main(void)
 	unsigned char pressedKey = 0;
     int delta_up = 3, delta_down = -3, delta_right = 3, delta_left = -3, x_init = 100, y_init = 100; 
     int x_fin = 120, y_fin = 120; 
-
+	
+	clear_screen(); 
 	
     while (true)
     {
-		clear_screen(); 
+
+		load_screen(x_init, y_init, x_fin, y_fin); 
 		read_keyboard(&pressedKey);
 		
 		if (pressedKey == 0x29) {
@@ -93,7 +95,7 @@ int main(void)
 			make_box(x_init, y_init, x_fin, y_fin); 
 		}
 		
-		if(pressedKey == 0x72){
+		if(pressedKey == 0x72){ 
 			y_init = y_init + delta_up;
 			y_fin = y_fin + delta_up;
 			make_box(x_init, y_init, x_fin, y_fin); 
@@ -111,8 +113,6 @@ int main(void)
 			make_box(x_init, y_init, x_fin, y_fin); 
 		}
 		
-		pressedKey == 0x00; 
-
         wait_for_vsync(); // swap front and back buffers on VGA vertical sync
         pixel_buffer_start = *(pixel_ctrl_ptr + 1); // new back buffer
     }
@@ -126,16 +126,24 @@ void plot_pixel(int x, int y, short int line_color) {
 void clear_screen() {
   for (int x = 0; x < RESOLUTION_X; x++) {
     for (int y = 0; y < RESOLUTION_Y; y++) {
-	if(*(short int * )(pixel_buffer_start + (y << 10) + (x << 1)) != 0x0000)
-      plot_pixel(x, y, 0x0000);
-    }
+      plot_pixel(x, y, CYAN);
+  }
   }
 }
+
+void load_screen(int x_init, int y_init, int x_fin, int y_fin) {
+  for (int x = x_init-6; x < x_fin+6; x++) {
+    for (int y = y_init-6; y < y_fin+6; y++) {
+      plot_pixel(x, y, CYAN);
+   }
+ }
+}
+
 
 void make_box(int x_init, int y_init, int x_fin, int y_fin){
   for (int x = x_init; x < x_fin; x++) {
     for (int y = y_init; y < y_fin; y++) {
-      plot_pixel(x, y, GREEN);
+      plot_pixel(x, y, RED);
    }
  }
 }
