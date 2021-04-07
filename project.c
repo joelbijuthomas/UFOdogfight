@@ -58,6 +58,7 @@ void wait_for_vsync();
 void keyboard_input(char *keypressed);
 void draw_UFO(UFO *ufo);
 void update_location_UFO(UFO *ufo, char PS2Data);
+void clear_UFO(UFO *ufo); 
 
 volatile int pixel_buffer_start; // global variable
 
@@ -84,19 +85,16 @@ int main(void)
     char key_pressed = 0;
     char *key_pressed_ptr = &key_pressed;
 
+	clear_screen();
+	
     while (1)
-    {
-		clear_screen(); 
+    {   
+		clear_UFO(ufo1_ptr); 
         /* Erase any boxes and lines that were drawn in the last iteration */
 		
         keyboard_input(key_pressed_ptr);
         draw_UFO(ufo1_ptr);
         update_location_UFO(ufo1_ptr, key_pressed);
-
-
-	
-		
-		
 
         // code for drawing the boxes and lines (not shown)
         // code for updating the locations of boxes (not shown)
@@ -118,6 +116,14 @@ void clear_screen() {
       plot_pixel(x, y, 0x0000);
     }
   }
+}
+
+void clear_UFO(UFO *ufo) {
+  for (int x = ufo->x - 20; x < ufo->x + 20; x++) {
+    for (int y = ufo->y - 20; y < ufo->y + 20; y++) {
+      plot_pixel(x, y, 0x0000);
+  }
+}
 }
 
 void draw_line(int x0, int y0, int x1, int y1, short int line_color){
@@ -181,27 +187,31 @@ void keyboard_input(char *keypressed){
 }
 
 void draw_UFO(UFO *ufo){
+    for(int x_shift = 0; x_shift <10; x_shift++){
+	for(int y_shift = 0; y_shift <10; y_shift++){
     plot_pixel(ufo->x, ufo->y, GREEN);
-    plot_pixel(ufo->x + 1 , ufo->y, GREEN);
-    plot_pixel(ufo->x, ufo->y + 1, GREEN);
-    plot_pixel(ufo->x + 1, ufo->y + 1, GREEN);
+    plot_pixel(ufo->x + x_shift , ufo->y, GREEN);
+    plot_pixel(ufo->x, ufo->y + y_shift, GREEN);
+    plot_pixel(ufo->x + x_shift, ufo->y + y_shift, GREEN);
+	}
+	}
 }
 
 void update_location_UFO(UFO *ufo, char PS2Data){
     if(PS2Data == 0x74){
-        ufo->dx = 4;
+        ufo->dx = 1;
 		ufo->dy = 0; 
     }
     else if(PS2Data == 0x6B){
-        ufo->dx = -4;
+        ufo->dx = -1;
 		ufo->dy = 0; 
     }
 	else if(PS2Data == 0x72){
-        ufo->dy = 4;
+        ufo->dy = 1;
 		ufo->dx = 0; 
     }
 	else if(PS2Data == 0x75){
-        ufo->dy = -4;
+        ufo->dy = -1;
 		ufo->dx = 0; 
     }
     ufo->x += ufo->dx;
