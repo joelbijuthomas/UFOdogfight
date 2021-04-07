@@ -43,14 +43,20 @@
 #include <stdio.h>
 #include <stdbool.h>
 
+typedef struct UFO{
+    int x;
+    int y;
+    int dx;
+    int dy;
+} UFO;
+
 void clear_screen(); 
 void draw_line(int x0, int y0, int x1, int y1, short int line_color); 
 void plot_pixel(int x, int y, short int line_color); 
 void swap(int *x, int *y);
-void wait_for_vsync(); 
-
-// Begin part3.c code for Lab 7
-
+void wait_for_vsync();
+void keyboard_input();
+void draw_UFO(UFO *ufo);
 
 volatile int pixel_buffer_start; // global variable
 
@@ -201,4 +207,18 @@ void wait_for_vsync() {
     status = *(pixel_ctrl_ptr + 3); 
 }
 
+void keyboard_input(char *keypressed){
+    volatile int *PS2_ptr = (int *) 0xFF200100;
+    int Data = *PS2_ptr;
+    *keypressed = Data & 0xFF;
+    while(Data & 0x8000){
+        Data = * PS2_ptr;
+    }
+}
 
+void draw_UFO(UFO *ufo){
+    plot_pixel(ufo->x, ufo->y, BLUE);
+    plot_pixel(ufo->x + 1 , ufo->y, BLUE);
+    plot_pixel(ufo->x, ufo->y + 1, BLUE);
+    plot_pixel(ufo->x + 1, ufo->x + 1, BLUE);
+}
