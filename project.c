@@ -77,60 +77,26 @@ int main(void)
     /* set back pixel buffer to start of SDRAM memory */
     *(pixel_ctrl_ptr + 1) = 0xC0000000;
     pixel_buffer_start = *(pixel_ctrl_ptr + 1); // we draw on the back buffer
+	
+    UFO ufo1 = {0,0,0,0};
+    UFO *ufo1_ptr = &ufo1; 
+    char key_pressed = 0;
+    char *key_pressed_ptr = &key_pressed;
 
-	int arrayx[100]; 
-	int arrayy[100]; 
-	int x_shift[100]; 
-	int y_shift[100]; 
-	int x_terms[100] = {-1,0,1}; 
-	int y_terms[100] = {-1,0,1}; 
-        for(int i=0; i<8; i++){
-			arrayx[i] = rand() % 319; 
-			arrayy[i] = rand() % 239; 
-			x_shift[i] = x_terms[rand()%3];
-            y_shift[i] = y_terms[rand()%3];
-		}
-	
-	int y3 = 0; 
-	
     while (true)
     {
 		clear_screen(); 
         /* Erase any boxes and lines that were drawn in the last iteration */
 		
-		for(int i=0; i<8; i++){		
-			arrayx[i]+=x_shift[i];
-            arrayy[i]+=y_shift[i];
+        draw_UFO(ufo1_ptr);
+        keyboard_input(key_pressed_ptr);
+        if(key_pressed = 0x74){
+            ufo1->dx = 4;
+        }
+        draw_UFO(ufo1_ptr);
 
-			
-			for(int j= 1; j<3; j++){
-			plot_pixel(arrayx[i], arrayy[i], BLUE);
-            plot_pixel(arrayx[i] + j , arrayy[i], BLUE);
-            plot_pixel(arrayx[i], arrayy[i] + j, BLUE);
-            plot_pixel(arrayx[i] + j, arrayy[i] + j, BLUE);
-			}
-			
-			if(i<7){
-			draw_line(arrayx[i], arrayy[i], arrayx[i+1], arrayy[i+1], GREEN);
-			}
-			if(i==7){
-				draw_line(arrayx[i], arrayy[i], arrayx[0], arrayy[0], GREEN);
-			}
-			
-			if (arrayx[i] == 0) {
-				x_shift[i] = 1;
-			}
-            else if (arrayx[i] == 319) {
-				x_shift[i] = -1;
-			}
-            if (arrayy[i] == 0) {
-				y_shift[i] = 1;
-			}
-            else if (arrayy[i] == 239){
-				y_shift[i] = -1;
-			}
 
-		}
+	
 		
 		
 
