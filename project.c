@@ -184,7 +184,7 @@ void draw_UFO(UFO *ufo){
     plot_pixel(ufo->x, ufo->y, GREEN);
     plot_pixel(ufo->x + 1 , ufo->y, GREEN);
     plot_pixel(ufo->x, ufo->y + 1, GREEN);
-    plot_pixel(ufo->x + 1, ufo->x + 1, GREEN);
+    plot_pixel(ufo->x + 1, ufo->y + 1, GREEN);
 }
 
 void update_location_UFO(UFO *ufo, char PS2Data){
