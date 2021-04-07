@@ -1,5 +1,3 @@
-//This is the file in which the code will be written
-// can you see this?
 /* This files provides address values that exist in the system */
 
 #define SDRAM_BASE            0xC0000000
