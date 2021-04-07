@@ -57,6 +57,7 @@ void swap(int *x, int *y);
 void wait_for_vsync();
 void keyboard_input();
 void draw_UFO(UFO *ufo);
+void update_location_UFO(UFO *ufo, char PS2Data);
 
 volatile int pixel_buffer_start; // global variable
 
@@ -89,11 +90,7 @@ int main(void)
         /* Erase any boxes and lines that were drawn in the last iteration */
 		
         draw_UFO(ufo1_ptr);
-        keyboard_input(key_pressed_ptr);
-        if(key_pressed == 0x74){
-            ufo1_ptr->dx = 4;
-        }
-        draw_UFO(ufo1_ptr);
+        update_location_UFO(ufo1_ptr, key_pressed);
 
 
 	
@@ -187,4 +184,13 @@ void draw_UFO(UFO *ufo){
     plot_pixel(ufo->x + 1 , ufo->y, BLUE);
     plot_pixel(ufo->x, ufo->y + 1, BLUE);
     plot_pixel(ufo->x + 1, ufo->x + 1, BLUE);
+}
+
+void update_location_UFO(UFO *ufo, char PS2Data){
+    if(PS2Data == 0x74){
+        ufo->dx = 4;
+    }
+    else if(PS2Data == 0x68){
+        ufo->dx = -4;
+    }
 }
