@@ -79,7 +79,7 @@ int main(void)
     *(pixel_ctrl_ptr + 1) = 0xC0000000;
     pixel_buffer_start = *(pixel_ctrl_ptr + 1); // we draw on the back buffer
 	
-    UFO ufo1 = {0,0,0,0};
+    UFO ufo1 = {100,120,0,0};
     UFO *ufo1_ptr = &ufo1; 
     char key_pressed = 0;
     char *key_pressed_ptr = &key_pressed;
@@ -190,9 +190,20 @@ void draw_UFO(UFO *ufo){
 void update_location_UFO(UFO *ufo, char PS2Data){
     if(PS2Data == 0x74){
         ufo->dx = 4;
+		ufo->dy = 0; 
     }
-    else if(PS2Data == 0x68){
+    else if(PS2Data == 0x6B){
         ufo->dx = -4;
+		ufo->dy = 0; 
+    }
+	else if(PS2Data == 0x72){
+        ufo->dy = 4;
+		ufo->dx = 0; 
+    }
+	else if(PS2Data == 0x75){
+        ufo->dy = -4;
+		ufo->dx = 0; 
     }
     ufo->x += ufo->dx;
+	ufo->y += ufo->dy;
 }
