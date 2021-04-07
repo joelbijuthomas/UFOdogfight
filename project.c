@@ -90,8 +90,8 @@ int main(void)
 		
         draw_UFO(ufo1_ptr);
         keyboard_input(key_pressed_ptr);
-        if(key_pressed = 0x74){
-            ufo1->dx = 4;
+        if(key_pressed == 0x74){
+            ufo1_ptr->dx = 4;
         }
         draw_UFO(ufo1_ptr);
 
