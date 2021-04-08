@@ -232,19 +232,19 @@ void update_location_UFO(UFO *ufo, char PS2Data){
 
 void update_AI_location(UFO *ufo, int count){
     if((rand()%4)==0){
-        ufo->dx = 1;
+        ufo->dx = 3;
 		ufo->dy = 0; 
     }
     else if(((rand()%4)==1) && (count==7)){
-        ufo->dx = -1;
+        ufo->dx = -3;
 		ufo->dy = 0;  
     }
 	else if((rand()%4)==2 && (count==7)){
-        ufo->dy = 1;
+        ufo->dy = 3;
 		ufo->dx = 0; 
     }
 	else if((rand()%4)==3 && (count==7)){
-        ufo->dy = -1;
+        ufo->dy = -3;
 		ufo->dx = 0; 
     }
     ufo->x += ufo->dx;
