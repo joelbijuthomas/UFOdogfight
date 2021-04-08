@@ -135,7 +135,7 @@ int main(void)
                 draw_UFO(ufo2_ptr, RED);
                 update_location_UFO(ufo1_ptr, key_pressed, missile1_ptr);
                 
-                //update_AI_location(ufo2_ptr, counter);
+                update_AI_location(ufo2_ptr, counter);
                 draw_missile(missile1_ptr);
                 update_missile_location(missile1_ptr);
 
