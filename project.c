@@ -43,6 +43,15 @@
 #include <stdio.h>
 #include <stdbool.h>
 
+typedef enum{
+    start,
+    game,
+    player_dead,
+    AI_dead,
+}gamestage;
+
+gamestage stage = game;
+
 //global variable
 int turn = 0;
 
@@ -61,6 +70,8 @@ typedef struct MISSILE{
     int dy;
 } MISSILE;
 
+//function prototypes
+
 void clear_screen(); 
 void draw_line(int x0, int y0, int x1, int y1, short int line_color); 
 void plot_pixel(int x, int y, short int line_color); 
@@ -73,6 +84,7 @@ void clear_UFO(UFO *ufo);
 void update_AI_location(UFO *ufo, int counter);
 void draw_missile(MISSILE *missile);
 void update_missile_location(MISSILE *missile);
+int check_hit(UFO *ufo, MISSILE *missile);
 
 volatile int pixel_buffer_start; // global variable
 
@@ -110,27 +122,44 @@ int main(void)
 	int counter = 0; 
 	
     while (1)
-    {   
-		counter = counter + 1;
-        clear_screen(); 
-		//clear_UFO(ufo1_ptr); 
-		//clear_UFO(ufo2_ptr); 
-		
-        keyboard_input(key_pressed_ptr);
-        draw_UFO(ufo1_ptr, GREEN);
-		draw_UFO(ufo2_ptr, RED);
-        update_location_UFO(ufo1_ptr, key_pressed, missile1_ptr);
-        
-		update_AI_location(ufo2_ptr, counter);
-        draw_missile(missile1_ptr);
-        update_missile_location(missile1_ptr);
+    {
+        switch (stage){
+            case game:
+                counter = counter + 1;
+                clear_screen(); 
+                //clear_UFO(ufo1_ptr); 
+                //clear_UFO(ufo2_ptr); 
+                
+                keyboard_input(key_pressed_ptr);
+                draw_UFO(ufo1_ptr, GREEN);
+                draw_UFO(ufo2_ptr, RED);
+                update_location_UFO(ufo1_ptr, key_pressed, missile1_ptr);
+                
+                //update_AI_location(ufo2_ptr, counter);
+                draw_missile(missile1_ptr);
+                update_missile_location(missile1_ptr);
 
 
-        wait_for_vsync(); // swap front and back buffers on VGA vertical sync
-        pixel_buffer_start = *(pixel_ctrl_ptr + 1); // new back buffer
-		if(counter == 7){
-			counter = 0; 
-		}
+                wait_for_vsync(); // swap front and back buffers on VGA vertical sync
+                pixel_buffer_start = *(pixel_ctrl_ptr + 1); // new back buffer
+                if(counter == 7){
+                    counter = 0; 
+                }
+                if(check_hit(ufo2_ptr, missile1_ptr)){
+                    stage = AI_dead;
+                    break;
+                }
+                break;
+
+            case AI_dead:
+                clear_screen();
+                wait_for_vsync();
+                pixel_buffer_start = *(pixel_ctrl_ptr + 1);
+                break;
+            
+            default:
+                printf("error\n");
+        }
     }
 }
 
@@ -319,4 +348,16 @@ void update_missile_location(MISSILE *missile){
     }
     missile->x += missile->dx;
     missile->y += missile->dy;
+}
+
+int check_hit(UFO *ufo, MISSILE *missile){
+    int centreX = missile->x + 5;
+    int centreY = missile->y + 5;
+
+    if((centreX > ufo->x) && (centreX < ufo->x + 10) && (centreY > ufo->y) && (centreY < ufo->y + 10)){
+        return 1;
+    }
+    else{
+        return 0;
+    }
 }
