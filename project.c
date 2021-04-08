@@ -43,12 +43,23 @@
 #include <stdio.h>
 #include <stdbool.h>
 
+//global variable
+int turn = 0;
+
+//structs
 typedef struct UFO{
     int x;
     int y;
     int dx;
     int dy;
 } UFO;
+
+typedef struct MISSILE{
+    int x;
+    int y;
+    int dx;
+    int dy;
+} MISSILE;
 
 void clear_screen(); 
 void draw_line(int x0, int y0, int x1, int y1, short int line_color); 
@@ -57,9 +68,11 @@ void swap(int *x, int *y);
 void wait_for_vsync();
 void keyboard_input(char *keypressed);
 void draw_UFO(UFO *ufo, short int line_color);
-void update_location_UFO(UFO *ufo, char PS2Data);
+void update_location_UFO(UFO *ufo, char PS2Data, MISSILE *missile);
 void clear_UFO(UFO *ufo); 
-void update_AI_location(UFO *ufo, int counter); 
+void update_AI_location(UFO *ufo, int counter);
+void draw_missile(MISSILE *missile);
+void update_missile_location(MISSILE *missile);
 
 volatile int pixel_buffer_start; // global variable
 
@@ -84,7 +97,11 @@ int main(void)
     UFO ufo1 = {100,120,0,0};
     UFO *ufo1_ptr = &ufo1; 
 	UFO ufo2 = {100,100,0,0};
-    UFO *ufo2_ptr = &ufo2; 
+    UFO *ufo2_ptr = &ufo2;
+    MISSILE missile1 = {0,0,0,0};
+    MISSILE missile2;
+    MISSILE *missile1_ptr = &missile1;
+    MISSILE *missile2_ptr = &missile2; 
     char key_pressed = 0;
     char *key_pressed_ptr = &key_pressed;
 
@@ -94,19 +111,20 @@ int main(void)
 	
     while (1)
     {   
-		counter = counter + 1; 
-		clear_UFO(ufo1_ptr); 
-		clear_UFO(ufo2_ptr); 
-        /* Erase any boxes and lines that were drawn in the last iteration */
+		counter = counter + 1;
+        clear_screen(); 
+		//clear_UFO(ufo1_ptr); 
+		//clear_UFO(ufo2_ptr); 
 		
         keyboard_input(key_pressed_ptr);
         draw_UFO(ufo1_ptr, GREEN);
 		draw_UFO(ufo2_ptr, RED);
-        update_location_UFO(ufo1_ptr, key_pressed);
-		update_AI_location(ufo2_ptr, counter); 
+        update_location_UFO(ufo1_ptr, key_pressed, missile1_ptr);
+        
+		update_AI_location(ufo2_ptr, counter);
+        draw_missile(missile1_ptr);
+        update_missile_location(missile1_ptr);
 
-        // code for drawing the boxes and lines (not shown)
-        // code for updating the locations of boxes (not shown)
 
         wait_for_vsync(); // swap front and back buffers on VGA vertical sync
         pixel_buffer_start = *(pixel_ctrl_ptr + 1); // new back buffer
@@ -122,12 +140,11 @@ void plot_pixel(int x, int y, short int line_color) {
 }
 
 void clear_screen() {
-  for (int x = 0; x < RESOLUTION_X; x++) {
-    for (int y = 0; y < RESOLUTION_Y; y++) {
-	if(*(short int * )(pixel_buffer_start + (y << 10) + (x << 1)) != 0x0000)
-      plot_pixel(x, y, 0x0000);
+    for (int x = 0; x < RESOLUTION_X; x++) {
+        for (int y = 0; y < RESOLUTION_Y; y++) {
+            plot_pixel(x,y,0);
+        }
     }
-  }
 }
 
 void clear_UFO(UFO *ufo) {
@@ -201,30 +218,56 @@ void keyboard_input(char *keypressed){
 void draw_UFO(UFO *ufo, short int line_color){
     for(int x_shift = 0; x_shift <10; x_shift++){
 	for(int y_shift = 0; y_shift <10; y_shift++){
-    plot_pixel(ufo->x, ufo->y, line_color);
-    plot_pixel(ufo->x + x_shift , ufo->y, line_color);
-    plot_pixel(ufo->x, ufo->y + y_shift, line_color);
     plot_pixel(ufo->x + x_shift, ufo->y + y_shift, line_color);
 	}
 	}
 }
 
-void update_location_UFO(UFO *ufo, char PS2Data){
-    if(PS2Data == 0x74){
+void update_location_UFO(UFO *ufo, char PS2Data, MISSILE *missile){
+    if(PS2Data == 0x29  && turn){
+        missile->x = ufo->x;
+        missile->y = ufo->y;
+        if(ufo->dx > 0){
+            missile->dx = 7;
+            missile->dy = 0; 
+        }
+        else if(ufo->dx < 0){
+            missile->dx = -7;
+            missile->dy = 0;
+        }
+        else if(ufo->dy > 0){
+            missile->dx = 0;
+            missile->dy = 7;
+        }
+        else if(ufo->dy < 0){
+            missile->dx = 0;
+            missile->dy = -7;
+        }
+        else{
+            missile->dx = 0;
+            missile->dy = 0;
+        }
+        turn = 0;
+    }
+    else if(PS2Data == 0x74){
         ufo->dx = 1;
-		ufo->dy = 0; 
+		ufo->dy = 0;
+        turn = 1;
     }
     else if(PS2Data == 0x6B){
         ufo->dx = -1;
-		ufo->dy = 0; 
+		ufo->dy = 0;
+        turn = 1;
     }
 	else if(PS2Data == 0x72){
         ufo->dy = 1;
-		ufo->dx = 0; 
+		ufo->dx = 0;
+        turn = 1;
     }
 	else if(PS2Data == 0x75){
         ufo->dy = -1;
-		ufo->dx = 0; 
+		ufo->dx = 0;
+        turn = 1;
     }
     ufo->x += ufo->dx;
 	ufo->y += ufo->dy;
@@ -249,4 +292,23 @@ void update_AI_location(UFO *ufo, int count){
     }
     ufo->x += ufo->dx;
 	ufo->y += ufo->dy;
+}
+
+void draw_missile(MISSILE *missile){
+    for(int i = 0; i<4; i++){
+        for(int j = 0; j<4; j++){
+            plot_pixel(missile->x + i, missile->y + j, ORANGE);
+        }
+    }
+}
+
+void update_missile_location(MISSILE *missile){
+    if(missile->x < 1  || missile->x > 314){
+        missile->dx = -missile->dx;
+    }
+    else if(missile->y < 5 || missile->y > 234){
+        missile->dy = -missile->dy;
+    }
+    missile->x += missile->dx;
+    missile->y += missile->dy;
 }
