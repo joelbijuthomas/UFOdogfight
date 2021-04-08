@@ -250,44 +250,52 @@ void update_location_UFO(UFO *ufo, char PS2Data, MISSILE *missile){
         turn = 0;
     }
     else if(PS2Data == 0x74){
-        ufo->dx = 1;
+        ufo->dx = 2;
 		ufo->dy = 0;
         turn = 1;
     }
     else if(PS2Data == 0x6B){
-        ufo->dx = -1;
+        ufo->dx = -2;
 		ufo->dy = 0;
         turn = 1;
     }
 	else if(PS2Data == 0x72){
-        ufo->dy = 1;
+        ufo->dy = 2;
 		ufo->dx = 0;
         turn = 1;
     }
 	else if(PS2Data == 0x75){
-        ufo->dy = -1;
+        ufo->dy = -2;
 		ufo->dx = 0;
         turn = 1;
     }
+    if(ufo->x < 1  || ufo->x > 314){
+        ufo->dx = -ufo->dx;
+    }
+    else if(ufo->y < 8 || ufo->y > 234){            //These lines have to be changed.
+        ufo->dy = -ufo->dy;
+    }
+    ufo->x += ufo->dx;
+    ufo->y += ufo->dy;
     ufo->x += ufo->dx;
 	ufo->y += ufo->dy;
 }
 
 void update_AI_location(UFO *ufo, int count){
     if((rand()%4)==0){
-        ufo->dx = 1;
+        ufo->dx = 2;
 		ufo->dy = 0; 
     }
     else if(((rand()%4)==1) && (count==7)){
-        ufo->dx = -1;
+        ufo->dx = -2;
 		ufo->dy = 0;  
     }
 	else if((rand()%4)==2 && (count==7)){
-        ufo->dy = 1;
+        ufo->dy = 2;
 		ufo->dx = 0; 
     }
 	else if((rand()%4)==3 && (count==7)){
-        ufo->dy = -1;
+        ufo->dy = -2;
 		ufo->dx = 0; 
     }
     ufo->x += ufo->dx;
