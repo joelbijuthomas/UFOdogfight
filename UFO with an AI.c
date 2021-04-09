@@ -975,10 +975,10 @@ void draw_missile(MISSILE *missile, short int line_color){
 }
 
 void update_missile_location(MISSILE *missile){
-    if(missile->x < 1  || missile->x > 314){
+    if(missile->x < 25  || missile->x > 290){
         missile->dx = -missile->dx;
     }
-    else if(missile->y < 13 || missile->y > 234){
+    else if(missile->y < 25 || missile->y > 215){
         missile->dy = -missile->dy;
     }
     missile->x += missile->dx;
