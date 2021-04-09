@@ -693,11 +693,11 @@ int main(void)
                 break;
                 
             case game:
-                delay = 10000;
-                if(counter_var==0){
-                add_screen(); 
-                    counter_var = counter_var + 1; 
-                }
+                // delay = 10000;
+                // if(counter_var==0){
+                // add_screen(); 
+                //     counter_var = counter_var + 1; 
+                // }
 
                 clear_UFO(ufo1_ptr); 
                 clear_UFO(ufo2_ptr); 
@@ -894,16 +894,20 @@ void keyboard_input(char *keypressed){
 void draw_UFO1(UFO *ufo, short int line_color){
     for(int x_shift = 0; x_shift <10; x_shift++){
         for(int y_shift = 0; y_shift <10; y_shift++){
-                plot_pixel(ufo->x + x_shift, ufo->y + y_shift, UFOImageCheck[y_shift][x_shift]);
+            if(UFOImage[y_shift][x_shift] != 65535 && UFOImage[y_shift][x_shift] != 50745){
+                plot_pixel(ufo->x + x_shift, ufo->y + y_shift, UFOImage[y_shift][x_shift]);
+            }
         }
     }
 }
 
 void draw_UFO2(UFO *ufo, short int line_color){
     for(int x_shift = 0; x_shift <10; x_shift++){
-    for(int y_shift = 0; y_shift <10; y_shift++){
-    plot_pixel(ufo->x + x_shift, ufo->y + y_shift, UFOImage2[y_shift][x_shift]);
-       }
+        for(int y_shift = 0; y_shift <10; y_shift++){
+            if(UFOImage2[y_shift][x_shift] != 65535 && UFOImage2[y_shift][x_shift] != 48663){
+                plot_pixel(ufo->x + x_shift, ufo->y + y_shift, UFOImage2[y_shift][x_shift]);
+            }
+        }
     }
 }
 
