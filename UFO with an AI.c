@@ -555,7 +555,34 @@ const Mars[240][320] = {
 
 };
 
+const UFOImage[10][10] = {
+    {65535,65503,65535,50745,27491,29602,46486,65535,63454,65535},
+    {65535,65535,59230,31687,63392,65516,31717,55069,65535,65535},
+    {65535,33805,16612,44160,65504,65506,52672,29031,38130,59228},
+    {42324,18752,28672,31297,50752,50784,35714,49478,32768,37968},
+    {24834,37280,26624,18432,18465,24836,32965,39010,47616,41284},
+    {22560,40960,35424,32864,34912,41057,39104,49376,57664,34880},
+    {16904,30850,34976,49152,53664,59648,61600,55616,47105,18952},
+    {42325,6404,22821,33125,37059,41155,41155,24739,12775,50777},
+    {65535,35921,97,16871,23145,18952,6339,65,48599,65535},
+    {65503,65535,38001,14628,8224,10305,18920,48566,65535,65503},
 
+};
+
+
+const UFOImage2[10][10] = {
+    {2048,0,1,67,4358,4423,67,33,0,0},
+    {1,2147,34,8616,27666,29844,17133,66,65,33},
+    {3,3,100,21425,27796,27828,29909,294,66,33},
+    {6,72,10733,31895,23475,19314,34104,17135,68,36},
+    {8302,23125,25302,27480,29624,29656,33881,27510,10573,2120},
+    {22933,29273,27192,25143,29401,29466,27353,25207,25141,16689},
+    {29143,29144,29144,29177,27098,27066,29179,27098,31259,27065},
+    {18511,33336,31192,29081,31228,31164,31165,29116,29114,29146},
+    {8200,16493,27029,29177,29082,29115,29147,29145,24949,16528},
+    {4102,6152,14382,20692,22808,24889,22808,18643,12366,6152},
+
+};
 
 //function prototypes
 
@@ -566,7 +593,8 @@ void plot_pixel(int x, int y, short int line_color);
 void swap(int *x, int *y);
 void wait_for_vsync();
 void keyboard_input(char *keypressed);
-void draw_UFO(UFO *ufo, short int line_color);
+void draw_UFO1(UFO *ufo, short int line_color);
+void draw_UFO2(UFO *ufo, short int line_color);
 void update_location_UFO(UFO *ufo, char PS2Data, MISSILE *missile);
 void clear_UFO(UFO *ufo); 
 void update_AI_location(UFO *ufo, int counter);
@@ -620,8 +648,8 @@ int main(void)
                 clear_UFO(ufo2_ptr); 
                 
                 keyboard_input(key_pressed_ptr);
-                draw_UFO(ufo1_ptr, GREEN);
-                draw_UFO(ufo2_ptr, RED);
+                draw_UFO1(ufo1_ptr, GREEN);
+                draw_UFO2(ufo2_ptr, RED);
                 update_location_UFO(ufo1_ptr, key_pressed, missile1_ptr);
                 update_location_UFO2(ufo2_ptr, key_pressed, missile2_ptr);
                 
@@ -754,11 +782,19 @@ void keyboard_input(char *keypressed){
     }
 }
 
-void draw_UFO(UFO *ufo, short int line_color){
+void draw_UFO1(UFO *ufo, short int line_color){
     for(int x_shift = 0; x_shift <10; x_shift++){
     for(int y_shift = 0; y_shift <10; y_shift++){
-    plot_pixel(ufo->x + x_shift, ufo->y + y_shift, line_color);
+    plot_pixel(ufo->x + x_shift, ufo->y + y_shift, UFOImage[y_shift][x_shift]);
+       }
     }
+}
+
+void draw_UFO2(UFO *ufo, short int line_color){
+    for(int x_shift = 0; x_shift <10; x_shift++){
+    for(int y_shift = 0; y_shift <10; y_shift++){
+    plot_pixel(ufo->x + x_shift, ufo->y + y_shift, UFOImage2[y_shift][x_shift]);
+       }
     }
 }
 
