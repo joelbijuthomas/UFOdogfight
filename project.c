@@ -957,15 +957,15 @@ void update_location_UFO(UFO *ufo, char PS2Data, MISSILE *missile, volatile int 
 
 void update_location_UFO2(UFO *ufo, char PS2Data, MISSILE *missile, volatile int *pixel_ctrl_ptr){
     if(PS2Data == 0x24  && turn){
-        missile->x = ufo->x;
+        MISSILE old_missile2 = {missile->x, missile->y, 0, 0};
+        clear_Missile(&old_missile2);
+        wait_for_vsync();
+        pixel_buffer_start = *(pixel_ctrl_ptr + 1);
+        clear_Missile(&old_missile2);
+        wait_for_vsync();
+        pixel_buffer_start = *(pixel_ctrl_ptr + 1);
+		missile->x = ufo->x;
         missile->y = ufo->y;
-        MISSILE old_missile = {missile->x, missile->y, 0, 0};
-        clear_Missile(&old_missile);
-        wait_for_vsync();
-        pixel_buffer_start = *(pixel_ctrl_ptr + 1);
-        clear_Missile(&old_missile);
-        wait_for_vsync();
-        pixel_buffer_start = *(pixel_ctrl_ptr + 1);
         if(ufo->dx > 0){
             missile->dx = 7;
             missile->dy = 0; 
