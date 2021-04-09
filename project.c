@@ -571,16 +571,16 @@ const UFOImage[10][10] = {
 
 
 const UFOImage2[10][10] = {
-    {2048,0,1,67,4358,4423,67,33,0,0},
-    {1,2147,34,8616,27666,29844,17133,66,65,33},
-    {3,3,100,21425,27796,27828,29909,294,66,33},
-    {6,72,10733,31895,23475,19314,34104,17135,68,36},
-    {8302,23125,25302,27480,29624,29656,33881,27510,10573,2120},
-    {22933,29273,27192,25143,29401,29466,27353,25207,25141,16689},
-    {29143,29144,29144,29177,27098,27066,29179,27098,31259,27065},
-    {18511,33336,31192,29081,31228,31164,31165,29116,29114,29146},
-    {8200,16493,27029,29177,29082,29115,29147,29145,24949,16528},
-    {4102,6152,14382,20692,22808,24889,22808,18643,12366,6152},
+	{65535,65535,65535,48663,13284,13316,44469,65535,65535,65535},
+	{65535,63422,57083,21641,14177,28585,21704,57051,65535,65535},
+	{63422,31822,23237,13568,12256,14306,17890,35849,40210,57083},
+	{38130,17058,29408,17313,9729,9760,19587,46341,35809,38095},
+	{25316,25568,27360,23136,21122,27460,35780,40002,36096,40069},
+	{25249,39936,25600,31616,33728,40001,37985,46432,48576,35809},
+	{21096,29474,31680,46272,44448,50688,52736,46496,46274,25320},
+	{40179,14790,21092,33668,37923,42115,39971,27331,21129,48631},
+	{65535,35921,8419,18983,23208,21095,10563,8420,44406,65535},
+	{65535,63390,35921,14789,8449,10530,19016,44405,65503,65535},
 
 };
 
@@ -707,19 +707,49 @@ void clear_screen() {
 }
 
 void clear_UFO(UFO *ufo) { 
-  for (int x = ufo->x - 10; x < ufo->x + 20; x++) {
-    for (int y = ufo->y-8; y < ufo->y + 20; y++) {
-      plot_pixel(x, y, Mars[y][x]);
-  }
-}
+    for (int x = ufo->x - 10; x < ufo->x + 20; x++){
+        for (int y = ufo->y-8; y < ufo->y + 20; y++) {
+            plot_pixel(x, y, Mars[y][x]);
+        }
+    }
 }
 
 void clear_Missile(MISSILE *missile) {
-  for (int x = missile->x - 20; x < missile->x + 20; x++) {
-    for (int y = missile->y - 20; y < missile->y + 20; y++) {
-      plot_pixel(x, y, 0x0000);
-  }
-}
+    if(missile->x < 1){
+        for (int x = missile->x; x < missile->x + 14; x++) {
+            for (int y = missile->y - 14; y < missile->y + 14; y++) {
+                plot_pixel(x, y, Mars[y][x]);
+            }     
+        }
+    }
+    else if(missile->x > 314){
+        for (int x = missile->x-14; x < missile->x; x++) {
+            for (int y = missile->y - 14; y < missile->y + 14; y++) {
+                plot_pixel(x, y, Mars[y][x]);
+            }     
+        }
+    }
+    else if(missile->y < 13){
+        for (int x = missile->x-14; x < missile->x+14; x++) {
+            for (int y = missile->y; y < missile->y + 14; y++) {
+                plot_pixel(x, y, Mars[y][x]);
+            }     
+        }
+    }
+    else if(missile->y > 234){
+        for (int x = missile->x-14; x < missile->x+14; x++) {
+            for (int y = missile->y-14; y < missile->y; y++) {
+                plot_pixel(x, y, Mars[y][x]);
+            }     
+        }
+    }
+    else{
+        for (int x = missile->x - 14; x < missile->x + 14; x++) {
+            for (int y = missile->y - 14; y < missile->y + 14; y++) {
+                plot_pixel(x, y, Mars[y][x]);
+            }     
+        }
+    }
 }
 
 void draw_line(int x0, int y0, int x1, int y1, short int line_color){
@@ -794,9 +824,11 @@ void draw_UFO1(UFO *ufo, short int line_color){
 
 void draw_UFO2(UFO *ufo, short int line_color){
     for(int x_shift = 0; x_shift <10; x_shift++){
-    for(int y_shift = 0; y_shift <10; y_shift++){
-    plot_pixel(ufo->x + x_shift, ufo->y + y_shift, UFOImage2[y_shift][x_shift]);
-       }
+        for(int y_shift = 0; y_shift <10; y_shift++){
+            if(UFOImage2[y_shift][x_shift] != 65535 && UFOImage2[y_shift][x_shift] != 48663){
+    			plot_pixel(ufo->x + x_shift, ufo->y + y_shift, UFOImage2[y_shift][x_shift]);
+			}
+        }
     }
 }
 
