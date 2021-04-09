@@ -1069,5 +1069,3 @@ void clear_all_text(int x1, int y1, char a) {
         }
     }
 }
-
-//Random line to show git.
