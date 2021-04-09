@@ -670,6 +670,8 @@ int main(void)
     int value[] = {0b00111111, 0b00000110, 0b01011011, 0b01001111, 0b01100110,
                    0b01101101, 0b01111101, 0b00000111, 0b01111111, 0b01100111}; 
     int delay = 10000000;
+    int UFO1_Lives = 2;
+    int UFO2_Lives = 2;
     
     while (1)
     {
@@ -691,7 +693,7 @@ int main(void)
                 break;
                 
             case game:
-                delay = 1000000;
+                delay = 10000;
                 if(counter_var==0){
                 add_screen(); 
                     counter_var = counter_var + 1; 
@@ -716,10 +718,9 @@ int main(void)
                 draw_char(35, 3, NumberArray[Array_Counter]);
                 *HEX_PTR1 = value[Array_Counter];
                 *HEX_PTR2 = value[Array_Counter];
-                //Delay loop for HEX
-                //while(delay != 0){
-                //   delay = delay - 1;
-                //}
+                while(delay != 0){
+                   delay = delay - 1;
+                }
                 
                 Array_Counter = Array_Counter + 1; 
                 if(Array_Counter == 9){
@@ -734,16 +735,32 @@ int main(void)
                     counter = 0; 
                 }
                 if(check_hit(ufo2_ptr, missile1_ptr)){
+                    UFO2_Lives-=1; 
+                    if(UFO2_Lives==0){
                     stage = player2_dead;
-                    break;
+                    }
+                    missile1_ptr->x = 0; 
+                    missile1_ptr->y = 0;
+                    missile1_ptr->dx = 0; 
+                    missile1_ptr->dy = 0; 
+                    clear_Missile(missile1_ptr); 
+                    break; 
                 }
                 if(check_hit(ufo1_ptr, missile2_ptr)){
+                    UFO1_Lives-=1; 
+                    if(UFO1_Lives==0){
                     stage = player1_dead;
-                    break;
+                    }
+                    missile2_ptr->x = 0; 
+                    missile2_ptr->y = 0;
+                    missile2_ptr->dx = 0; 
+                    missile2_ptr->dy = 0; 
+                    clear_Missile(missile2_ptr);
+                    break; 
                 }
                 if(check_UFO_hit_UFO(ufo1_ptr, ufo2_ptr)){
-                    stage = Game_Fully_Over;
-                    break; 
+                   stage = Game_Fully_Over;
+                   break; 
                 }
                 break;
 
@@ -964,7 +981,7 @@ void update_location_UFO2(UFO *ufo, char PS2Data, MISSILE *missile, volatile int
         clear_Missile(&old_missile2);
         wait_for_vsync();
         pixel_buffer_start = *(pixel_ctrl_ptr + 1);
-		missile->x = ufo->x;
+        missile->x = ufo->x;
         missile->y = ufo->y;
         if(ufo->dx > 0){
             missile->dx = 7;
