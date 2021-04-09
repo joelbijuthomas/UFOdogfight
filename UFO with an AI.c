@@ -632,6 +632,9 @@ volatile int pixel_buffer_start; // global variable
 int main(void)
 {
     volatile int * pixel_ctrl_ptr = (int *)0xFF203020;
+    volatile int *HEX_PTR1 = (int *)0xff200020;
+    volatile int *HEX_PTR2 = (int *)0xff200030;
+
     // declare other variables(not shown)
     // initialize location and direction of rectangles(not shown)
 
@@ -668,6 +671,9 @@ int main(void)
     draw_string(12, 3, Player1_Score);
     draw_string(50, 3, Player2_Score);
     char NumberArray[] = {'0','1','2','3','4','5','6','7','8','9'}; 
+    int value[] = {0b00111111, 0b00000110, 0b01011011, 0b01001111, 0b01100110,
+                   0b01101101, 0b01111101, 0b00000111, 0b01111111, 0b01100111}; 
+    int delay = 10000000;
     
     while (1)
     {
@@ -689,6 +695,7 @@ int main(void)
                 break;
                 
             case game:
+                delay = 1000000;
                 if(counter_var==0){
                 add_screen(); 
                     counter_var = counter_var + 1; 
@@ -710,7 +717,14 @@ int main(void)
                 update_missile_location(missile1_ptr);
                 draw_missile(missile2_ptr, CYAN);
                 update_missile_location(missile2_ptr);
-                draw_char(35, 3, NumberArray[Array_Counter]); 
+                draw_char(35, 3, NumberArray[Array_Counter]);
+                *HEX_PTR1 = value[Array_Counter];
+                *HEX_PTR2 = value[Array_Counter];
+                //Delay loop for HEX
+                //while(delay != 0){
+                //   delay = delay - 1;
+                //}
+                
                 Array_Counter = Array_Counter + 1; 
                 if(Array_Counter == 9){
                     Array_Counter = 0; 
