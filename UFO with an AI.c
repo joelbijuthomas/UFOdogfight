@@ -828,6 +828,7 @@ void draw_UFO2(UFO *ufo, short int line_color){
 
 void update_location_UFO(UFO *ufo, char PS2Data, MISSILE *missile){
     if(PS2Data == 0x29  && turn){
+        clear_screen();
         missile->x = ufo->x;
         missile->y = ufo->y;
         if(ufo->dx > 0){
@@ -886,6 +887,7 @@ void update_location_UFO(UFO *ufo, char PS2Data, MISSILE *missile){
 
 void update_location_UFO2(UFO *ufo, char PS2Data, MISSILE *missile){
     if(PS2Data == 0x24  && turn){
+        clear_screen();
         missile->x = ufo->x;
         missile->y = ufo->y;
         if(ufo->dx > 0){

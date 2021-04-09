@@ -569,18 +569,31 @@ const UFOImage[10][10] = {
 
 };
 
+const UFOImageCheck [10][10] = {
+    {65535,65503,65535,50713,29571,29602,46519,65535,63454,65535},
+    {65535,65535,59229,31687,63392,65515,31717,57117,65535,65535},
+    {65535,33805,16580,44160,65504,65506,52672,29032,38130,59228},
+    {40275,18752,30720,31329,50752,50784,35683,49446,32768,40048},
+    {24834,37280,26624,20480,18465,24836,32965,39010,47616,41285},
+    {22561,40960,35424,32864,34944,41057,39104,49376,57632,34913},
+    {16904,30850,34976,49152,53664,59616,61600,55616,45057,21065},
+    {44405,6404,20773,33158,37092,41155,39108,24739,12808,52890},
+    {65535,35953,97,16871,23145,18952,6339,97,50712,65535},
+    {65503,65535,38066,14693,10305,10338,21032,50679,65535,65503},
+
+};
 
 const UFOImage2[10][10] = {
-	{65535,65535,65535,48663,13284,13316,44469,65535,65535,65535},
-	{65535,63422,57083,21641,14177,28585,21704,57051,65535,65535},
-	{63422,31822,23237,13568,12256,14306,17890,35849,40210,57083},
-	{38130,17058,29408,17313,9729,9760,19587,46341,35809,38095},
-	{25316,25568,27360,23136,21122,27460,35780,40002,36096,40069},
-	{25249,39936,25600,31616,33728,40001,37985,46432,48576,35809},
-	{21096,29474,31680,46272,44448,50688,52736,46496,46274,25320},
-	{40179,14790,21092,33668,37923,42115,39971,27331,21129,48631},
-	{65535,35921,8419,18983,23208,21095,10563,8420,44406,65535},
-	{65535,63390,35921,14789,8449,10530,19016,44405,65503,65535},
+    {65535,65535,65535,48663,13284,13316,44469,65535,65535,65535},
+    {65535,63422,57083,21641,14177,28585,21704,57051,65535,65535},
+    {63422,31822,23237,13568,12256,14306,17890,35849,40210,57083},
+    {38130,17058,29408,17313,9729,9760,19587,46341,35809,38095},
+    {25316,25568,27360,23136,21122,27460,35780,40002,36096,40069},
+    {25249,39936,25600,31616,33728,40001,37985,46432,48576,35809},
+    {21096,29474,31680,46272,44448,50688,52736,46496,46274,25320},
+    {40179,14790,21092,33668,37923,42115,39971,27331,21129,48631},
+    {65535,35921,8419,18983,23208,21095,10563,8420,44406,65535},
+    {65535,63390,35921,14789,8449,10530,19016,44405,65503,65535},
 
 };
 
@@ -603,6 +616,9 @@ void update_missile_location(MISSILE *missile);
 int check_hit(UFO *ufo, MISSILE *missile);
 void clear_Missile(MISSILE *missile); 
 void update_location_UFO2(UFO *ufo, char PS2Data, MISSILE *missile); 
+void clear_all_text(int x1, int y1, char a);
+void draw_string(int x, int y, char str[]);
+void draw_char(int x, int y, char letter);
 
 volatile int pixel_buffer_start; // global variable
 
@@ -639,6 +655,10 @@ int main(void)
     
     int counter = 0; 
     
+    clear_all_text(80, 60, ' ');
+    char Text_to_output[] = "Hi, My name is Keshav"; 
+    draw_string(50, 50, Text_to_output);
+    
     while (1)
     {
         switch (stage){
@@ -646,6 +666,8 @@ int main(void)
                 counter = counter + 1;
                 clear_UFO(ufo1_ptr); 
                 clear_UFO(ufo2_ptr); 
+                clear_Missile(missile1_ptr);
+                clear_Missile(missile2_ptr);
                 
                 keyboard_input(key_pressed_ptr);
                 draw_UFO1(ufo1_ptr, GREEN);
@@ -707,48 +729,24 @@ void clear_screen() {
 }
 
 void clear_UFO(UFO *ufo) { 
-    for (int x = ufo->x - 10; x < ufo->x + 20; x++){
-        for (int y = ufo->y-8; y < ufo->y + 20; y++) {
-            plot_pixel(x, y, Mars[y][x]);
-        }
-    }
+  for (int x = ufo->x - 10; x < ufo->x + 20; x++) {
+    for (int y = ufo->y-8; y < ufo->y + 20; y++) {
+      plot_pixel(x, y, Mars[y][x]);
+  }
+}
 }
 
 void clear_Missile(MISSILE *missile) {
-    if(missile->x < 1){
-        for (int x = missile->x; x < missile->x + 14; x++) {
-            for (int y = missile->y - 14; y < missile->y + 14; y++) {
-                plot_pixel(x, y, Mars[y][x]);
-            }     
-        }
-    }
-    else if(missile->x > 314){
-        for (int x = missile->x-14; x < missile->x; x++) {
-            for (int y = missile->y - 14; y < missile->y + 14; y++) {
-                plot_pixel(x, y, Mars[y][x]);
-            }     
-        }
-    }
-    else if(missile->y < 13){
-        for (int x = missile->x-14; x < missile->x+14; x++) {
-            for (int y = missile->y; y < missile->y + 14; y++) {
-                plot_pixel(x, y, Mars[y][x]);
-            }     
-        }
-    }
-    else if(missile->y > 234){
-        for (int x = missile->x-14; x < missile->x+14; x++) {
-            for (int y = missile->y-14; y < missile->y; y++) {
-                plot_pixel(x, y, Mars[y][x]);
-            }     
-        }
-    }
-    else{
-        for (int x = missile->x - 14; x < missile->x + 14; x++) {
-            for (int y = missile->y - 14; y < missile->y + 14; y++) {
-                plot_pixel(x, y, Mars[y][x]);
-            }     
-        }
+    int x1 = missile->x - 20;
+    int x2 = missile->x + 20; 
+    int y1 = missile->y - 20;
+    int y2 = missile->y + 20; 
+    if(x1>0 && x2<320 && y1>0 && y2<320){
+  for (int x = missile->x - 20; x < missile->x + 20; x++) {
+    for (int y = missile->y - 20; y < missile->y + 20; y++) {
+      plot_pixel(x, y, Mars[y][x]);
+  }
+}
     }
 }
 
@@ -814,21 +812,17 @@ void keyboard_input(char *keypressed){
 
 void draw_UFO1(UFO *ufo, short int line_color){
     for(int x_shift = 0; x_shift <10; x_shift++){
-    	for(int y_shift = 0; y_shift <10; y_shift++){
-			if(UFOImage[y_shift][x_shift] != 65535 && UFOImage[y_shift][x_shift] != 50745){
-    			plot_pixel(ufo->x + x_shift, ufo->y + y_shift, UFOImage[y_shift][x_shift]);
-			}
-       	}
+        for(int y_shift = 0; y_shift <10; y_shift++){
+                plot_pixel(ufo->x + x_shift, ufo->y + y_shift, UFOImageCheck[y_shift][x_shift]);
+        }
     }
 }
 
 void draw_UFO2(UFO *ufo, short int line_color){
     for(int x_shift = 0; x_shift <10; x_shift++){
-        for(int y_shift = 0; y_shift <10; y_shift++){
-            if(UFOImage2[y_shift][x_shift] != 65535 && UFOImage2[y_shift][x_shift] != 48663){
-    			plot_pixel(ufo->x + x_shift, ufo->y + y_shift, UFOImage2[y_shift][x_shift]);
-			}
-        }
+    for(int y_shift = 0; y_shift <10; y_shift++){
+    plot_pixel(ufo->x + x_shift, ufo->y + y_shift, UFOImage2[y_shift][x_shift]);
+       }
     }
 }
 
@@ -981,10 +975,10 @@ void draw_missile(MISSILE *missile, short int line_color){
 }
 
 void update_missile_location(MISSILE *missile){
-    if(missile->x < 1  || missile->x > 314){
+    if(missile->x < 25  || missile->x > 290){
         missile->dx = -missile->dx;
     }
-    else if(missile->y < 13 || missile->y > 234){
+    else if(missile->y < 25 || missile->y > 215){
         missile->dy = -missile->dy;
     }
     missile->x += missile->dx;
@@ -1007,6 +1001,26 @@ void ending_screen(){
     for (int x = 0; x < 320; x++) {
         for (int y = 0; y < 240; y++) {
             plot_pixel(x,y,KSI[y][x]);
+        }
+    }
+}
+
+void draw_string(int x, int y, char str[]) {
+    int string_length = strlen(str); 
+    for (int i = 0; i < string_length; i++) {
+        draw_char(x+i, y, str[i]);
+    }
+}
+
+void draw_char(int x, int y, char letter) {
+    volatile int charBuffer = 0xc9000000;
+    *(char *)(charBuffer + (y << 7) + x) = letter;
+}
+
+void clear_all_text(int x1, int y1, char a) { 
+    for (int x = 0; x < x1; x++) {
+        for (int y = 0; y < y1; y++) {
+            draw_char(x, y, a);
         }
     }
 }
