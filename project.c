@@ -46,7 +46,7 @@
 typedef enum{
     start,
     game,
-	game_begin, 
+    game_begin, 
     player1_dead,
     player2_dead,
 }gamestage;
@@ -628,6 +628,9 @@ volatile int pixel_buffer_start; // global variable
 int main(void)
 {
     volatile int * pixel_ctrl_ptr = (int *)0xFF203020;
+    volatile int *HEX_PTR1 = (int *)0xff200020;
+    volatile int *HEX_PTR2 = (int *)0xff200030;
+
     // declare other variables(not shown)
     // initialize location and direction of rectangles(not shown)
 
@@ -639,7 +642,7 @@ int main(void)
     /* initialize a pointer to the pixel buffer, used by drawing functions */
     pixel_buffer_start = *pixel_ctrl_ptr;
     //clear_screen(); // pixel_buffer_start points to the pixel buffer
-	ending_screen(); 
+    ending_screen(); 
     /* set back pixel buffer to start of SDRAM memory */
     *(pixel_ctrl_ptr + 1) = 0xC0000000;
     pixel_buffer_start = *(pixel_ctrl_ptr + 1); // we draw on the back buffer
@@ -654,39 +657,45 @@ int main(void)
     MISSILE *missile2_ptr = &missile2; 
     char key_pressed = 0;
     char *key_pressed_ptr = &key_pressed;
-
     
-    int counter = 0, counter_var = 0; 
+    int counter = 0, Array_Counter = 0, counter_var = 0; 
     
     clear_all_text(80, 60, ' ');
-    char Text_to_output[] = "Hi, My name is Keshav"; 
-    draw_string(50, 50, Text_to_output);
+    char Player1_Score[] = "Player 1 Score: "; 
+    char Player2_Score[] = "Player 2 Score: "; 
+    draw_string(12, 3, Player1_Score);
+    draw_string(50, 3, Player2_Score);
+    char NumberArray[] = {'0','1','2','3','4','5','6','7','8','9'}; 
+    int value[] = {0b00111111, 0b00000110, 0b01011011, 0b01001111, 0b01100110,
+                   0b01101101, 0b01111101, 0b00000111, 0b01111111, 0b01100111}; 
+    int delay = 10000000;
     
     while (1)
     {
         switch (stage){
-			case game_begin:
-				ending_screen();
-				//wait_for_vsync();
-				//pixel_buffer_start = *(pixel_ctrl_ptr + 1);
-				keyboard_input(key_pressed_ptr);
-				if(key_pressed == 0x5A && start_screen){
-					add_screen();
-					wait_for_vsync();
-					pixel_buffer_start = *(pixel_ctrl_ptr + 1);
-					add_screen();
-					start_screen = 0;
-					stage = game;
-                	//break;
-				}
-				break;
-				
+            case game_begin:
+                ending_screen();
+                //wait_for_vsync();
+                //pixel_buffer_start = *(pixel_ctrl_ptr + 1);
+                keyboard_input(key_pressed_ptr);
+                if(key_pressed == 0x5A && start_screen){
+                    add_screen();
+                    wait_for_vsync();
+                    pixel_buffer_start = *(pixel_ctrl_ptr + 1);
+                    add_screen();
+                    start_screen = 0;
+                    stage = game;
+                    //break;
+                }
+                break;
+                
             case game:
-				if(counter_var==0){
-				add_screen(); 
-					counter_var = counter_var + 1; 
-				}
-                counter = counter + 1;
+                delay = 1000000;
+                if(counter_var==0){
+                add_screen(); 
+                    counter_var = counter_var + 1; 
+                }
+
                 clear_UFO(ufo1_ptr); 
                 clear_UFO(ufo2_ptr); 
                 clear_Missile(missile1_ptr);
@@ -703,6 +712,19 @@ int main(void)
                 update_missile_location(missile1_ptr);
                 draw_missile(missile2_ptr, CYAN);
                 update_missile_location(missile2_ptr);
+                draw_char(35, 3, NumberArray[Array_Counter]);
+                *HEX_PTR1 = value[Array_Counter];
+                *HEX_PTR2 = value[Array_Counter];
+                //Delay loop for HEX
+                //while(delay != 0){
+                //   delay = delay - 1;
+                //}
+                
+                Array_Counter = Array_Counter + 1; 
+                if(Array_Counter == 9){
+                    Array_Counter = 0; 
+                }
+
 
 
                 wait_for_vsync(); // swap front and back buffers on VGA vertical sync
@@ -859,13 +881,13 @@ void draw_UFO2(UFO *ufo, short int line_color){
 
 void update_location_UFO(UFO *ufo, char PS2Data, MISSILE *missile, volatile int *pixel_ctrl_ptr){
     if(PS2Data == 0x29  && turn){
-		MISSILE old_missile = {missile->x, missile->y, 0, 0};
-		clear_Missile(&old_missile);
-		wait_for_vsync();
-		pixel_buffer_start = *(pixel_ctrl_ptr + 1);
-		clear_Missile(&old_missile);
-		wait_for_vsync();
-		pixel_buffer_start = *(pixel_ctrl_ptr + 1);
+        MISSILE old_missile = {missile->x, missile->y, 0, 0};
+        clear_Missile(&old_missile);
+        wait_for_vsync();
+        pixel_buffer_start = *(pixel_ctrl_ptr + 1);
+        clear_Missile(&old_missile);
+        wait_for_vsync();
+        pixel_buffer_start = *(pixel_ctrl_ptr + 1);
         missile->x = ufo->x;
         missile->y = ufo->y;
         if(ufo->dx > 0){
@@ -926,13 +948,13 @@ void update_location_UFO2(UFO *ufo, char PS2Data, MISSILE *missile, volatile int
     if(PS2Data == 0x24  && turn){
         missile->x = ufo->x;
         missile->y = ufo->y;
-		MISSILE old_missile = {missile->x, missile->y, 0, 0};
-		clear_Missile(&old_missile);
-		wait_for_vsync();
-		pixel_buffer_start = *(pixel_ctrl_ptr + 1);
-		clear_Missile(&old_missile);
-		wait_for_vsync();
-		pixel_buffer_start = *(pixel_ctrl_ptr + 1);
+        MISSILE old_missile = {missile->x, missile->y, 0, 0};
+        clear_Missile(&old_missile);
+        wait_for_vsync();
+        pixel_buffer_start = *(pixel_ctrl_ptr + 1);
+        clear_Missile(&old_missile);
+        wait_for_vsync();
+        pixel_buffer_start = *(pixel_ctrl_ptr + 1);
         if(ufo->dx > 0){
             missile->dx = 7;
             missile->dy = 0; 
