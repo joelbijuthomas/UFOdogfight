@@ -49,6 +49,7 @@ typedef enum{
     game_begin, 
     player1_dead,
     player2_dead,
+    Game_Fully_Over,
 }gamestage;
 
 gamestage stage = game_begin;
@@ -740,6 +741,10 @@ int main(void)
                     stage = player1_dead;
                     break;
                 }
+                if(check_UFO_hit_UFO(ufo1_ptr, ufo2_ptr)){
+                    stage = Game_Fully_Over;
+                    break; 
+                }
                 break;
 
             case player2_dead:
@@ -754,6 +759,12 @@ int main(void)
                 pixel_buffer_start = *(pixel_ctrl_ptr + 1);
                 break;
             
+            case Game_Fully_Over:
+                ending_screen(); 
+                wait_for_vsync();
+                pixel_buffer_start = *(pixel_ctrl_ptr + 1);
+                break;
+                
             default:
                 printf("error\n");
         }
@@ -1069,6 +1080,18 @@ void ending_screen(){
         for (int y = 0; y < 240; y++) {
             plot_pixel(x,y,KSI[y][x]);
         }
+    }
+}
+
+int check_UFO_hit_UFO(UFO *ufo1, UFO *ufo2){
+    int centreX = ufo2->x + 5;
+    int centreY = ufo2->y + 5;
+
+    if((centreX > ufo1->x) && (centreX < ufo1->x + 10) && (centreY > ufo1->y) && (centreY < ufo1->y + 10)){
+        return 1;
+    }
+    else{
+        return 0;
     }
 }
 
