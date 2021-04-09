@@ -610,14 +610,14 @@ void wait_for_vsync();
 void keyboard_input(char *keypressed);
 void draw_UFO1(UFO *ufo, short int line_color);
 void draw_UFO2(UFO *ufo, short int line_color);
-void update_location_UFO(UFO *ufo, char PS2Data, MISSILE *missile);
+void update_location_UFO(UFO *ufo, char PS2Data, MISSILE *missile, volatile int *pixel_ctrl_ptr);
 void clear_UFO(UFO *ufo); 
 void update_AI_location(UFO *ufo, int counter);
 void draw_missile(MISSILE *missile, short int line_color);
 void update_missile_location(MISSILE *missile);
 int check_hit(UFO *ufo, MISSILE *missile);
 void clear_Missile(MISSILE *missile); 
-void update_location_UFO2(UFO *ufo, char PS2Data, MISSILE *missile); 
+void update_location_UFO2(UFO *ufo, char PS2Data, MISSILE *missile, volatile int *pixel_ctrl_ptr); 
 void clear_all_text(int x1, int y1, char a);
 void draw_string(int x, int y, char str[]);
 void draw_char(int x, int y, char letter);
@@ -695,8 +695,8 @@ int main(void)
                 keyboard_input(key_pressed_ptr);
                 draw_UFO1(ufo1_ptr, GREEN);
                 draw_UFO2(ufo2_ptr, RED);
-                update_location_UFO(ufo1_ptr, key_pressed, missile1_ptr);
-                update_location_UFO2(ufo2_ptr, key_pressed, missile2_ptr);
+                update_location_UFO(ufo1_ptr, key_pressed, missile1_ptr, pixel_ctrl_ptr);
+                update_location_UFO2(ufo2_ptr, key_pressed, missile2_ptr, pixel_ctrl_ptr);
                 
                 //update_AI_location(ufo2_ptr, counter);
                 draw_missile(missile1_ptr, ORANGE);
@@ -857,8 +857,15 @@ void draw_UFO2(UFO *ufo, short int line_color){
     }
 }
 
-void update_location_UFO(UFO *ufo, char PS2Data, MISSILE *missile){
+void update_location_UFO(UFO *ufo, char PS2Data, MISSILE *missile, volatile int *pixel_ctrl_ptr){
     if(PS2Data == 0x29  && turn){
+		MISSILE old_missile = {missile->x, missile->y, 0, 0};
+		clear_Missile(&old_missile);
+		wait_for_vsync();
+		pixel_buffer_start = *(pixel_ctrl_ptr + 1);
+		clear_Missile(&old_missile);
+		wait_for_vsync();
+		pixel_buffer_start = *(pixel_ctrl_ptr + 1);
         missile->x = ufo->x;
         missile->y = ufo->y;
         if(ufo->dx > 0){
@@ -915,10 +922,17 @@ void update_location_UFO(UFO *ufo, char PS2Data, MISSILE *missile){
     ufo->y += ufo->dy;
 }
 
-void update_location_UFO2(UFO *ufo, char PS2Data, MISSILE *missile){
+void update_location_UFO2(UFO *ufo, char PS2Data, MISSILE *missile, volatile int *pixel_ctrl_ptr){
     if(PS2Data == 0x24  && turn){
         missile->x = ufo->x;
         missile->y = ufo->y;
+		MISSILE old_missile = {missile->x, missile->y, 0, 0};
+		clear_Missile(&old_missile);
+		wait_for_vsync();
+		pixel_buffer_start = *(pixel_ctrl_ptr + 1);
+		clear_Missile(&old_missile);
+		wait_for_vsync();
+		pixel_buffer_start = *(pixel_ctrl_ptr + 1);
         if(ufo->dx > 0){
             missile->dx = 7;
             missile->dy = 0; 
