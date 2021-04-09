@@ -46,14 +46,16 @@
 typedef enum{
     start,
     game,
+	game_begin, 
     player1_dead,
     player2_dead,
 }gamestage;
 
-gamestage stage = game;
+gamestage stage = game_begin;
 
 //global variable
 int turn = 0;
+int start_screen = 1;
 
 //structs
 typedef struct UFO{
@@ -619,6 +621,7 @@ void update_location_UFO2(UFO *ufo, char PS2Data, MISSILE *missile);
 void clear_all_text(int x1, int y1, char a);
 void draw_string(int x, int y, char str[]);
 void draw_char(int x, int y, char letter);
+void add_screen(); 
 
 volatile int pixel_buffer_start; // global variable
 
@@ -635,7 +638,8 @@ int main(void)
     wait_for_vsync();
     /* initialize a pointer to the pixel buffer, used by drawing functions */
     pixel_buffer_start = *pixel_ctrl_ptr;
-    clear_screen(); // pixel_buffer_start points to the pixel buffer
+    //clear_screen(); // pixel_buffer_start points to the pixel buffer
+	ending_screen(); 
     /* set back pixel buffer to start of SDRAM memory */
     *(pixel_ctrl_ptr + 1) = 0xC0000000;
     pixel_buffer_start = *(pixel_ctrl_ptr + 1); // we draw on the back buffer
@@ -651,9 +655,8 @@ int main(void)
     char key_pressed = 0;
     char *key_pressed_ptr = &key_pressed;
 
-    clear_screen();
     
-    int counter = 0; 
+    int counter = 0, counter_var = 0; 
     
     clear_all_text(80, 60, ' ');
     char Text_to_output[] = "Hi, My name is Keshav"; 
@@ -662,7 +665,27 @@ int main(void)
     while (1)
     {
         switch (stage){
+			case game_begin:
+				ending_screen();
+				//wait_for_vsync();
+				//pixel_buffer_start = *(pixel_ctrl_ptr + 1);
+				keyboard_input(key_pressed_ptr);
+				if(key_pressed == 0x5A && start_screen){
+					add_screen();
+					wait_for_vsync();
+					pixel_buffer_start = *(pixel_ctrl_ptr + 1);
+					add_screen();
+					start_screen = 0;
+					stage = game;
+                	//break;
+				}
+				break;
+				
             case game:
+				if(counter_var==0){
+				add_screen(); 
+					counter_var = counter_var + 1; 
+				}
                 counter = counter + 1;
                 clear_UFO(ufo1_ptr); 
                 clear_UFO(ufo2_ptr); 
@@ -721,6 +744,14 @@ void plot_pixel(int x, int y, short int line_color) {
 }
 
 void clear_screen() {
+    for (int x = 0; x < 320; x++) {
+        for (int y = 0; y < 240; y++) {
+            plot_pixel(x,y,Mars[y][x]);
+        }
+    }
+}
+
+void add_screen() {
     for (int x = 0; x < 320; x++) {
         for (int y = 0; y < 240; y++) {
             plot_pixel(x,y,Mars[y][x]);
