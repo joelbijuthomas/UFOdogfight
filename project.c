@@ -698,11 +698,7 @@ int main(void)
     
     int counter = 0, Array_Counter = 0, Array_Counter2 = 0, counter_var = 0; 
     
-    clear_all_text(80, 60, ' ');
-    char Player1_Score[] = "Player 1 Score: "; 
-    char Player2_Score[] = "Player 2 Score: "; 
-    draw_string(12, 3, Player1_Score);
-    draw_string(50, 3, Player2_Score);
+    
     char NumberArray[] = {'0','1','2','3','4','5','6','7','8','9'}; 
     int value[] = {0b00111111, 0b00000110, 0b01011011, 0b01001111, 0b01100110,
                    0b01101101, 0b01111101, 0b00000111, 0b01111111, 0b01100111}; 
@@ -717,6 +713,8 @@ int main(void)
                 ending_screen();
                 //wait_for_vsync();
                 //pixel_buffer_start = *(pixel_ctrl_ptr + 1);
+				char entry_text[] = "Press enter to start";
+				draw_string(32,28,entry_text);
                 keyboard_input(key_pressed_ptr);
                 if(key_pressed == 0x5A && start_screen){
                     add_screen();
@@ -735,7 +733,12 @@ int main(void)
                 // add_screen(); 
                 //     counter_var = counter_var + 1; 
                 // }
-
+				clear_all_text(80, 60, ' ');
+    			char Player1_Score[] = "Player 1 Score: "; 
+    			char Player2_Score[] = "Player 2 Score: "; 
+    			draw_string(12, 3, Player1_Score);
+    			draw_string(50, 3, Player2_Score);
+				
                 clear_UFO(ufo1_ptr); 
                 clear_UFO(ufo2_ptr); 
                 clear_Missile(missile1_ptr);
@@ -752,8 +755,8 @@ int main(void)
                 update_missile_location(missile1_ptr);
                 draw_missile(missile2_ptr, CYAN);
                 update_missile_location(missile2_ptr);
-                draw_char(35, 3, NumberArray[Array_Counter]);
-                draw_char(45, 3, NumberArray[Array_Counter2]);
+                draw_char(30, 3, NumberArray[Array_Counter]);
+                draw_char(68, 3, NumberArray[Array_Counter2]);
                 *HEX_PTR1 = value[Array_Counter];
                 *HEX_PTR2 = value[Array_Counter2];
                 
