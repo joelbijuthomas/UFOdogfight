@@ -626,12 +626,46 @@ void add_screen();
 
 volatile int pixel_buffer_start; // global variable
 
+#define AUDIO_BASE            0xFF203040
+
+#define BUF_SIZE 4000 
+#define BUF_THRESHOLD 96 
+#define pi 3.14159265
+    
+int s1[4000] = {0};
+
+void genSound(int freq) {
+        float acc = 0;
+        float discrete = (freq*pi*2) / 4000;
+        for (int i = 0 ; i < 400; i++){
+            s1[i] = sin(discrete*i) * 500000000;
+        }
+    
+        discrete = ((freq+200)*pi*2) / 4000;
+        for (int i = 0 ; i < 400; i++){
+            s1[i+400] = sin(discrete*i) * 100000000;
+        }
+}
+
+void playsound(long int buffer_index){
+    volatile int* audio_ptr = (int*)AUDIO_BASE;
+    int fifospace =*(audio_ptr + 1); 
+                while ((fifospace & 0x00FF0000) && (buffer_index < BUF_SIZE)) {
+                    *(audio_ptr + 2) = s1[buffer_index];
+                    *(audio_ptr + 3) = s1[buffer_index];
+                    ++buffer_index;
+            }
+        }
+
+
+
 int main(void)
 {
     volatile int * pixel_ctrl_ptr = (int *)0xFF203020;
     volatile int *HEX_PTR1 = (int *)0xff200020;
     volatile int *HEX_PTR2 = (int *)0xff200030;
-
+    genSound(400);
+    
     // declare other variables(not shown)
     // initialize location and direction of rectangles(not shown)
 
@@ -737,6 +771,7 @@ int main(void)
                     missile1_ptr->dy = 0; 
                     clear_Missile(missile1_ptr); 
                     Array_Counter = Array_Counter + 1; 
+                    //playsound(0);
                     break; 
                 }
                 if(check_hit(ufo1_ptr, missile2_ptr)){
@@ -750,6 +785,7 @@ int main(void)
                     missile2_ptr->dy = 0; 
                     clear_Missile(missile2_ptr);
                     Array_Counter2 = Array_Counter2 + 1; 
+                    //playsound(0);
                     break; 
                 }
                 if(check_UFO_hit_UFO(ufo1_ptr, ufo2_ptr)){
@@ -907,6 +943,7 @@ void draw_UFO2(UFO *ufo, short int line_color){
 
 void update_location_UFO(UFO *ufo, char PS2Data, MISSILE *missile, volatile int *pixel_ctrl_ptr){
     if(PS2Data == 0x29  && turn){
+        playsound(0);
         MISSILE old_missile = {missile->x, missile->y, 0, 0};
         clear_Missile(&old_missile);
         wait_for_vsync();
@@ -972,6 +1009,7 @@ void update_location_UFO(UFO *ufo, char PS2Data, MISSILE *missile, volatile int 
 
 void update_location_UFO2(UFO *ufo, char PS2Data, MISSILE *missile, volatile int *pixel_ctrl_ptr){
     if(PS2Data == 0x24  && turn){
+        playsound(0);
         MISSILE old_missile2 = {missile->x, missile->y, 0, 0};
         clear_Missile(&old_missile2);
         wait_for_vsync();
