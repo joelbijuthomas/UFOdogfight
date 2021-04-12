@@ -1432,8 +1432,8 @@ void gencosSound(int freq, int Audio_Array[]) {
 int main(void)
 {
     volatile int * pixel_ctrl_ptr = (int *)0xFF203020;
-    volatile int *HEX_PTR1 = (int *)0xff200020;
-    volatile int *HEX_PTR2 = (int *)0xff200030;
+    volatile int *HEX_PTR1 = (int *)0xff200030;
+    volatile int *HEX_PTR2 = (int *)0xff200020;
     genSound_Missile(400, Audio_Array);
     genSound_Explosion(400, Audio_Array2); 
     int speed = 7; 
@@ -1611,6 +1611,7 @@ int main(void)
              Array_Counter2 = 0;
              UFO1_Lives = 4;
              UFO2_Lives = 4;
+            *HEX_PTR1= value[4];
              draw_ScreenChar(30, 3, '4');
              player1_wins();
              char player2_dead_text[] = "Press esc to restart";
@@ -1649,6 +1650,7 @@ int main(void)
             Array_Counter2 = 0;
             UFO1_Lives = 4;
             UFO2_Lives = 4;
+            *HEX_PTR2 = value[4];
             draw_ScreenChar(68, 3, '4');
             player2_wins();
             char player1_dead_text[] = "Press esc to restart";
