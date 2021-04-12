@@ -1343,7 +1343,7 @@ void draw_line(int x0, int y0, int x1, int y1, short int line_color);
 void plot_pixel(int x, int y, short int line_color); 
 void swap(int *x, int *y);
 void wait_for_vsync();
-void keyboard_input(char *keypressed);
+void take_keyboardinput(char *keypressed);
 void draw_UFO1(UFO *ufo, short int line_color);
 void draw_UFO2(UFO *ufo, short int line_color);
 void update_location_UFO(UFO *ufo, char PS2Data, MISSILE *missile, volatile int *pixel_ctrl_ptr);
@@ -1355,8 +1355,8 @@ int check_hit(UFO *ufo, MISSILE *missile);
 void clear_Missile(MISSILE *missile); 
 void update_location_UFO2(UFO *ufo, char PS2Data, MISSILE *missile, volatile int *pixel_ctrl_ptr); 
 void clear_all_text(int x1, int y1, char a);
-void draw_string(int x, int y, char str[]);
-void draw_char(int x, int y, char letter);
+void draw_text(int x, int y, char str[]);
+void draw_ScreenChar(int x, int y, char letter);
 void add_screen();
 void draw_game_over();
 void player1_wins();
@@ -1369,45 +1369,61 @@ volatile int pixel_buffer_start; // global variable
 
 #define BUF_SIZE 4000 
 #define pi 3.14159265
-    
-int s1[4000] = {0};
-int s2[4000] = {0};
 
-void genSound_Missile(int freq, int s1[]) {
-        float acc = 0;
-        float discrete = (freq*pi*2) / 4000;
-        for (int i = 0 ; i < 400; i++){
-            s1[i] = sin(discrete*i) * 500000000;
-        }
+int Audio_Array[4000] = {0};
+int Audio_Array2[4000] = {0};
+int Audio_Array_Background[4000] = {0};
+
+
+void genSound_Missile(int freq, int Audio_Array[]) {
+    float acc = 0;
+    float discrete = (freq*pi*2) / 4000;
+    for (int i = 0 ; i < 400; i++){
+        Audio_Array[i] = sin(discrete*i) * 500000000;
+    }
     
-        discrete = ((freq+200)*pi*2) / 4000;
-        for (int i = 0 ; i < 400; i++){
-            s1[i+400] = sin(discrete*i) * 100000000;
-        }
+    discrete = ((freq+200)*pi*2) / 4000;
+    for (int i = 0 ; i < 400; i++){
+        Audio_Array[i+400] = sin(discrete*i) * 100000000;
+    }
 }
 
-void genSound_Explosion(int freq, int s1[]) {
-        float acc = 0;
-        float discrete = (freq*pi*2) / 4000;
-        for (int i = 0 ; i < 800; i++){
-            s1[i] = sin(discrete*i) * 100000000;
-        }
+void genSound_Explosion(int freq, int Audio_Array[]) {
+    float acc = 0;
+    float discrete = (freq*pi*2) / 4000;
+    for (int i = 0 ; i < 800; i++){
+        Audio_Array[i] = sin(discrete*i) * 100000000;
+    }
     
-        discrete = ((freq+200)*pi*2) / 7000;
-        for (int i = 0 ; i < 800; i++){
-            s1[i+400] = sin(discrete*i) * 60000000;
-        }
+    discrete = ((freq+200)*pi*2) / 7000;
+    for (int i = 0 ; i < 800; i++){
+        Audio_Array[i+400] = sin(discrete*i) * 60000000;
+    }
 }
 
-void playsound(long int buffer_index, int s1[]){
+void playsound(long int Audio_Buffer_index, int Audio_Array[]){
     volatile int* audio_ptr = (int*)AUDIO_BASE;
     int fifospace =*(audio_ptr + 1); 
-                while ((fifospace & 0x00FF0000) && (buffer_index < 4000)) {
-                    *(audio_ptr + 2) = s1[buffer_index];
-                    *(audio_ptr + 3) = s1[buffer_index];
-                    ++buffer_index;
-            }
-        }
+    while ((fifospace & 0x00FF0000) && (Audio_Buffer_index < 4000)) {
+        *(audio_ptr + 2) = Audio_Array[Audio_Buffer_index];
+        *(audio_ptr + 3) = Audio_Array[Audio_Buffer_index];
+        Audio_Buffer_index = Audio_Buffer_index + 1;
+    }
+}
+
+
+void gensinSound(int freq, int Audio_Array[]) {
+    for (int i = 0 ; i < 600; i++){
+        float discrete = (freq*pi*2*i) / 4000;
+        Audio_Array[i] = sin(discrete) * 20000000000;
+    }
+}
+void gencosSound(int freq, int Audio_Array[]) {
+    for (int i = 0 ; i < 600; i++){
+       float discrete = (freq*pi*2*i) / 4000;
+       Audio_Array[i] = cos(discrete) * 20000000000;
+   }       
+}
 
 
 
@@ -1416,8 +1432,8 @@ int main(void)
     volatile int * pixel_ctrl_ptr = (int *)0xFF203020;
     volatile int *HEX_PTR1 = (int *)0xff200020;
     volatile int *HEX_PTR2 = (int *)0xff200030;
-    genSound_Missile(400, s1);
-    genSound_Explosion(400, s2); 
+    genSound_Missile(400, Audio_Array);
+    genSound_Explosion(400, Audio_Array2); 
     
     // declare other variables(not shown)
     // initialize location and direction of rectangles(not shown)
@@ -1451,65 +1467,96 @@ int main(void)
     
     char NumberArray[] = {'0','1','2','3','4','5','6','7','8','9'}; 
     int value[] = {0b00111111, 0b00000110, 0b01011011, 0b01001111, 0b01100110,
-                   0b01101101, 0b01111101, 0b00000111, 0b01111111, 0b01100111}; 
-    int delay = 10000000;
-    int UFO1_Lives = 4;
-    int UFO2_Lives = 4;
-    
-    while (1)
-    {
+       0b01101101, 0b01111101, 0b00000111, 0b01111111, 0b01100111}; 
+       int delay = 10000000;
+       int UFO1_Lives = 4;
+       int UFO2_Lives = 4;
+
+       while (1)
+       {
         switch (stage){
             case game_begin:
-                ending_screen();
+            ending_screen();
                 //wait_for_vsync();
                 //pixel_buffer_start = *(pixel_ctrl_ptr + 1);
-                char entry_text[] = "Press enter to start";
-                draw_string(32,28,entry_text);
-                keyboard_input(key_pressed_ptr);
-                if(key_pressed == 0x5A && start_screen){
-                    add_screen();
-                    wait_for_vsync();
-                    pixel_buffer_start = *(pixel_ctrl_ptr + 1);
-                    add_screen();
-                    start_screen = 0;
-                    stage = game;
+            char entry_text[] = "Press enter to start";
+            draw_text(32,28,entry_text);
+            take_keyboardinput(key_pressed_ptr);
+            if(key_pressed == 0x5A && start_screen){
+                add_screen();
+                wait_for_vsync();
+                pixel_buffer_start = *(pixel_ctrl_ptr + 1);
+                add_screen();
+                start_screen = 0;
+                stage = game;
                     //break;
-                }
-                break;
-                
-            case game:
+            } else{ 
+             for(int i=100; i<1000; i+=100){
+                gensinSound(i, Audio_Array_Background);
+                playsound(0, Audio_Array_Background);
+            }
+                            if(key_pressed == 0x5A && start_screen){
+                add_screen();
+                wait_for_vsync();
+                pixel_buffer_start = *(pixel_ctrl_ptr + 1);
+                add_screen();
+                start_screen = 0;
+                stage = game;
+                    //break;
+            }
+            for(int i=1000; i>=100; i-=100){
+                gensinSound(i, Audio_Array_Background);
+                playsound(0, Audio_Array_Background);
+            }
+                            if(key_pressed == 0x5A && start_screen){
+                add_screen();
+                wait_for_vsync();
+                pixel_buffer_start = *(pixel_ctrl_ptr + 1);
+                add_screen();
+                start_screen = 0;
+                stage = game;
+                    //break;
+            }
+            for(int i=1000; i>=100; i-=100){
+                gensinSound(i, Audio_Array_Background);
+                playsound(0, Audio_Array_Background);
+            }                           
+        }
+        break;
+
+        case game:
                 // delay = 10000;
                 // if(counter_var==0){
                 // add_screen(); 
                 //     counter_var = counter_var + 1; 
                 // }
-                clear_all_text(80, 60, ' ');
-                char Player1_Score[] = "Player 1 Score: "; 
-                char Player2_Score[] = "Player 2 Score: "; 
-                draw_string(12, 3, Player1_Score);
-                draw_string(50, 3, Player2_Score);
-                
-                clear_UFO(ufo1_ptr); 
-                clear_UFO(ufo2_ptr); 
-                clear_Missile(missile1_ptr);
-                clear_Missile(missile2_ptr);
-                
-                keyboard_input(key_pressed_ptr);
-                draw_UFO1(ufo1_ptr, GREEN);
-                draw_UFO2(ufo2_ptr, RED);
-                update_location_UFO(ufo1_ptr, key_pressed, missile1_ptr, pixel_ctrl_ptr);
-                update_location_UFO2(ufo2_ptr, key_pressed, missile2_ptr, pixel_ctrl_ptr);
-                
+        clear_all_text(80, 60, ' ');
+        char Player1_Score[] = "Player 1 Score: "; 
+        char Player2_Score[] = "Player 2 Score: "; 
+        draw_text(12, 3, Player1_Score);
+        draw_text(50, 3, Player2_Score);
+
+        clear_UFO(ufo1_ptr); 
+        clear_UFO(ufo2_ptr); 
+        clear_Missile(missile1_ptr);
+        clear_Missile(missile2_ptr);
+
+        take_keyboardinput(key_pressed_ptr);
+        draw_UFO1(ufo1_ptr, GREEN);
+        draw_UFO2(ufo2_ptr, RED);
+        update_location_UFO(ufo1_ptr, key_pressed, missile1_ptr, pixel_ctrl_ptr);
+        update_location_UFO2(ufo2_ptr, key_pressed, missile2_ptr, pixel_ctrl_ptr);
+
                 //update_AI_location(ufo2_ptr, counter);
-                draw_missile(missile1_ptr, ORANGE);
-                update_missile_location(missile1_ptr);
-                draw_missile(missile2_ptr, CYAN);
-                update_missile_location(missile2_ptr);
-                draw_char(30, 3, NumberArray[Array_Counter]);
-                draw_char(68, 3, NumberArray[Array_Counter2]);
-                *HEX_PTR1 = value[Array_Counter];
-                *HEX_PTR2 = value[Array_Counter2];
-                
+        draw_missile(missile1_ptr, ORANGE);
+        update_missile_location(missile1_ptr);
+        draw_missile(missile2_ptr, CYAN);
+        update_missile_location(missile2_ptr);
+        draw_ScreenChar(30, 3, NumberArray[Array_Counter]);
+        draw_ScreenChar(68, 3, NumberArray[Array_Counter2]);
+        *HEX_PTR1 = value[Array_Counter];
+        *HEX_PTR2 = value[Array_Counter2];
+
 
                 wait_for_vsync(); // swap front and back buffers on VGA vertical sync
                 pixel_buffer_start = *(pixel_ctrl_ptr + 1); // new back buffer
@@ -1519,7 +1566,7 @@ int main(void)
                 if(check_hit(ufo2_ptr, missile1_ptr)){
                     UFO2_Lives-=1; 
                     if(UFO2_Lives==0){
-                    stage = player2_dead;
+                        stage = player2_dead;
                     }
                     missile1_ptr->x = 0; 
                     missile1_ptr->y = 0;
@@ -1527,13 +1574,13 @@ int main(void)
                     missile1_ptr->dy = 0; 
                     clear_Missile(missile1_ptr); 
                     Array_Counter = Array_Counter + 1; 
-                    playsound(0,s2);
+                    playsound(0,Audio_Array2);
                     break; 
                 }
                 if(check_hit(ufo1_ptr, missile2_ptr)){
                     UFO1_Lives-=1; 
                     if(UFO1_Lives==0){
-                    stage = player1_dead;
+                        stage = player1_dead;
                     }
                     missile2_ptr->x = 0; 
                     missile2_ptr->y = 0;
@@ -1541,35 +1588,77 @@ int main(void)
                     missile2_ptr->dy = 0; 
                     clear_Missile(missile2_ptr);
                     Array_Counter2 = Array_Counter2 + 1; 
-                    playsound(0,s2);
+                    playsound(0,Audio_Array2);
                     break; 
                 }
                 if(check_UFO_hit_UFO(ufo1_ptr, ufo2_ptr)){
                    stage = Game_Fully_Over;
                    break; 
-                }
-                break;
+               }
+               break;
 
-            case player2_dead:
-                player1_wins();
-                wait_for_vsync();
-                pixel_buffer_start = *(pixel_ctrl_ptr + 1);
-                break;
-            
+               case player2_dead:
+               player1_wins();
+               wait_for_vsync();
+               pixel_buffer_start = *(pixel_ctrl_ptr + 1);
+               while(1){
+                for(int i=100; i<1000; i+=100){
+                    gensinSound(i, Audio_Array_Background);
+                    playsound(0, Audio_Array_Background);
+                }
+                for(int i=1000; i>=100; i-=100){
+                    gensinSound(i, Audio_Array_Background);
+                    playsound(0, Audio_Array_Background);
+                }
+                for(int i=1000; i>=100; i-=100){
+                    gensinSound(i, Audio_Array_Background);
+                    playsound(0, Audio_Array_Background);
+                } 
+            }
+            break;
+
             case player1_dead:
-                player2_wins();
-                wait_for_vsync();
-                pixel_buffer_start = *(pixel_ctrl_ptr + 1);
-                break;
-            
+            player2_wins();
+            wait_for_vsync();
+            pixel_buffer_start = *(pixel_ctrl_ptr + 1);
+            while(1){
+                for(int i=100; i<1000; i+=100){
+                    gensinSound(i, Audio_Array_Background);
+                    playsound(0, Audio_Array_Background);
+                }
+                for(int i=1000; i>=100; i-=100){
+                    gensinSound(i, Audio_Array_Background);
+                    playsound(0, Audio_Array_Background);
+                }
+                for(int i=1000; i>=100; i-=100){
+                    gensinSound(i, Audio_Array_Background);
+                    playsound(0, Audio_Array_Background);
+                } 
+            }
+            break;
+
             case Game_Fully_Over:
-                draw_game_over(); 
-                wait_for_vsync();
-                pixel_buffer_start = *(pixel_ctrl_ptr + 1);
-                break;
-                
+            draw_game_over(); 
+            wait_for_vsync();
+            pixel_buffer_start = *(pixel_ctrl_ptr + 1);
+            while(1){
+                for(int i=100; i<1000; i+=100){
+                    gensinSound(i, Audio_Array_Background);
+                    playsound(0, Audio_Array_Background);
+                }
+                for(int i=1000; i>=100; i-=100){
+                    gensinSound(i, Audio_Array_Background);
+                    playsound(0, Audio_Array_Background);
+                }
+                for(int i=1000; i>=100; i-=100){
+                    gensinSound(i, Audio_Array_Background);
+                    playsound(0, Audio_Array_Background);
+                } 
+            }
+            break;
+
             default:
-                printf("error\n");
+            printf("error\n");
         }
     }
 }
@@ -1633,52 +1722,12 @@ void clear_Missile(MISSILE *missile) {
     int y1 = missile->y - 20;
     int y2 = missile->y + 20; 
     if(x1>0 && x2<320 && y1>0 && y2<320){
-  for (int x = missile->x - 20; x < missile->x + 20; x++) {
-    for (int y = missile->y - 20; y < missile->y + 20; y++) {
-      plot_pixel(x, y, Mars[y][x]);
+      for (int x = missile->x - 20; x < missile->x + 20; x++) {
+        for (int y = missile->y - 20; y < missile->y + 20; y++) {
+          plot_pixel(x, y, Mars[y][x]);
+      }
   }
 }
-    }
-}
-
-void draw_line(int x0, int y0, int x1, int y1, short int line_color){
-    bool is_steep = abs(y1-y0) > abs(x1-x0); 
-    if(is_steep){
-        swap(&x0, &y0); 
-        swap(&x1, &y1); 
-    }
-    if(x0>x1){
-        swap(&x0, &x1); 
-        swap(&y0, &y1); 
-    }
-    int deltax = x1 - x0; 
-    int deltay = abs(y1-y0); 
-    int error = -(deltax/2); 
-    int y = y0; 
-    int y_step; 
-    if(y0<y1){
-        y_step = 1; 
-    } else{
-        y_step = -1; 
-    }
-    for(int i = x0; i <= x1; i++){
-        if(is_steep){
-            plot_pixel (y, i, line_color); 
-        } else{
-            plot_pixel (i, y, line_color); 
-        }
-        error = error + deltay; 
-        if(error>=0){
-            y = y+y_step; 
-            error = error - deltax; 
-        }
-    }
-}
-
-void swap(int *x, int *y){
-    int temp = *x; 
-    *x = *y;
-    *y = temp; 
 }
 
 void wait_for_vsync() {
@@ -1689,10 +1738,10 @@ void wait_for_vsync() {
     
     status = *(pixel_ctrl_ptr + 3); 
     while ((status & 0x01) != 0) 
-    status = *(pixel_ctrl_ptr + 3); 
+        status = *(pixel_ctrl_ptr + 3); 
 }
 
-void keyboard_input(char *keypressed){
+void take_keyboardinput(char *keypressed){
     volatile int *PS2_ptr = (int *) 0xFF200100;
     int Data = *PS2_ptr;
     *keypressed = Data & 0xFF;
@@ -1705,7 +1754,7 @@ void draw_UFO1(UFO *ufo, short int line_color){
     for(int x_shift = 0; x_shift <10; x_shift++){
         for(int y_shift = 0; y_shift <10; y_shift++){
           //  if(UFOImage[y_shift][x_shift] <= 58000 && UFOImage[y_shift][x_shift] != 50745){
-                plot_pixel(ufo->x + x_shift, ufo->y + y_shift, UFOImage[y_shift][x_shift]);
+            plot_pixel(ufo->x + x_shift, ufo->y + y_shift, UFOImage[y_shift][x_shift]);
           //  }
         }
     }
@@ -1715,7 +1764,7 @@ void draw_UFO2(UFO *ufo, short int line_color){
     for(int x_shift = 0; x_shift <10; x_shift++){
         for(int y_shift = 0; y_shift <10; y_shift++){
            // if(UFOImage2[y_shift][x_shift] != 65535 && UFOImage2[y_shift][x_shift] != 48663){
-                plot_pixel(ufo->x + x_shift, ufo->y + y_shift, UFOImage2[y_shift][x_shift]);
+            plot_pixel(ufo->x + x_shift, ufo->y + y_shift, UFOImage2[y_shift][x_shift]);
            // }
         }
     }
@@ -1723,7 +1772,7 @@ void draw_UFO2(UFO *ufo, short int line_color){
 
 void update_location_UFO(UFO *ufo, char PS2Data, MISSILE *missile, volatile int *pixel_ctrl_ptr){
     if(PS2Data == 0x29  && turn){
-        playsound(0, s1);
+        playsound(0, Audio_Array);
         MISSILE old_missile = {missile->x, missile->y, 0, 0};
         clear_Missile(&old_missile);
         wait_for_vsync();
@@ -1789,7 +1838,7 @@ void update_location_UFO(UFO *ufo, char PS2Data, MISSILE *missile, volatile int 
 
 void update_location_UFO2(UFO *ufo, char PS2Data, MISSILE *missile, volatile int *pixel_ctrl_ptr){
     if(PS2Data == 0x24  && turn){
-        playsound(0, s1);
+        playsound(0, Audio_Array);
         MISSILE old_missile2 = {missile->x, missile->y, 0, 0};
         clear_Missile(&old_missile2);
         wait_for_vsync();
@@ -1871,7 +1920,7 @@ void update_AI_location(UFO *ufo, int count){
         ufo->dx = 0; 
     }
     else if((rand()%5) == 5){
-        
+
     }
     ufo->x += ufo->dx;
     ufo->y += ufo->dy;
@@ -1928,22 +1977,24 @@ int check_UFO_hit_UFO(UFO *ufo1, UFO *ufo2){
     }
 }
 
-void draw_string(int x, int y, char str[]) {
-    int string_length = strlen(str); 
-    for (int i = 0; i < string_length; i++) {
-        draw_char(x+i, y, str[i]);
+void draw_text(int x, int y, char str[]) {
+    long int string_length = strlen(str); 
+    for (long int i = 0; i < string_length; i++) {
+        draw_ScreenChar(x+i, y, str[i]);
     }
 }
 
-void draw_char(int x, int y, char letter) {
+void draw_ScreenChar(int x, int y, char letter) {
     volatile int charBuffer = BUFFER_BASE;
     *(char *)(charBuffer + (y << 7) + x) = letter;
 }
 
 void clear_all_text(int x1, int y1, char a) { 
-    for (int x = 0; x < x1; x++) {
-        for (int y = 0; y < y1; y++) {
-            draw_char(x, y, a);
+    for (long int x = 0; x < x1; x++) {
+        for (long int y = 0; y < y1; y++) {
+            draw_ScreenChar(x, y, a);
         }
     }
 }
+//
+// random comments to reach 2000 mark lol 
