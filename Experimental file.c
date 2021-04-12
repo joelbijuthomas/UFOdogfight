@@ -1344,6 +1344,7 @@ void plot_pixel(int x, int y, short int line_color);
 void swap(int *x, int *y);
 void wait_for_vsync();
 void take_keyboardinput(char *keypressed);
+void take_keyboard2input(char *keypressed);
 void draw_UFO1(UFO *ufo, short int line_color);
 void draw_UFO2(UFO *ufo, short int line_color);
 void update_location_UFO(UFO *ufo, char PS2Data, MISSILE *missile, volatile int *pixel_ctrl_ptr);
@@ -1413,16 +1414,16 @@ void playsound(long int Audio_Buffer_index, int Audio_Array[]){
 
 
 void gensinSound(int freq, int Audio_Array[]) {
-        for (int i = 0 ; i < 200; i++){
-            float discrete = (freq*pi*2*i) / 4000;
-            Audio_Array[i] = sin(discrete) * 20000000000;
-        }
+    for (int i = 0 ; i < 600; i++){
+        float discrete = (freq*pi*2*i) / 4000;
+        Audio_Array[i] = sin(discrete) * 20000000000;
+    }
 }
 void gencosSound(int freq, int Audio_Array[]) {
-        for (int i = 0 ; i < 200; i++){
-             float discrete = (freq*pi*2*i) / 4000;
-            Audio_Array[i] = cos(discrete) * 20000000000;
-        }       
+    for (int i = 0 ; i < 600; i++){
+       float discrete = (freq*pi*2*i) / 4000;
+       Audio_Array[i] = cos(discrete) * 20000000000;
+   }       
 }
 
 
@@ -1461,19 +1462,22 @@ int main(void)
     MISSILE *missile2_ptr = &missile2; 
     char key_pressed = 0;
     char *key_pressed_ptr = &key_pressed;
-    
+    char key2_pressed = 0;
+    char *key_pressed_ptr_UFO2 = &key2_pressed;
+
+
     int counter = 0, Array_Counter = 0, Array_Counter2 = 0, counter_var = 0; 
     
     
     char NumberArray[] = {'0','1','2','3','4','5','6','7','8','9'}; 
     int value[] = {0b00111111, 0b00000110, 0b01011011, 0b01001111, 0b01100110,
-     0b01101101, 0b01111101, 0b00000111, 0b01111111, 0b01100111}; 
-     int delay = 10000000;
-     int UFO1_Lives = 4;
-     int UFO2_Lives = 4;
+       0b01101101, 0b01111101, 0b00000111, 0b01111111, 0b01100111}; 
+       int delay = 10000000;
+       int UFO1_Lives = 4;
+       int UFO2_Lives = 4;
 
-     while (1)
-     {
+       while (1)
+       {
         switch (stage){
             case game_begin:
             ending_screen();
@@ -1491,7 +1495,7 @@ int main(void)
                 stage = game;
                     //break;
             } else{ 
-               for(int i=100; i<1000; i+=100){
+             for(int i=100; i<1000; i+=100){
                 gensinSound(i, Audio_Array_Background);
                 playsound(0, Audio_Array_Background);
             }
@@ -1524,10 +1528,11 @@ int main(void)
         clear_Missile(missile2_ptr);
 
         take_keyboardinput(key_pressed_ptr);
+        take_keyboard2input(key_pressed_ptr_UFO2);
         draw_UFO1(ufo1_ptr, GREEN);
         draw_UFO2(ufo2_ptr, RED);
         update_location_UFO(ufo1_ptr, key_pressed, missile1_ptr, pixel_ctrl_ptr);
-        update_location_UFO2(ufo2_ptr, key_pressed, missile2_ptr, pixel_ctrl_ptr);
+        update_location_UFO2(ufo2_ptr, key2_pressed, missile2_ptr, pixel_ctrl_ptr);
 
                 //update_AI_location(ufo2_ptr, counter);
         draw_missile(missile1_ptr, ORANGE);
@@ -1574,37 +1579,79 @@ int main(void)
                     break; 
                 }
                 if(check_UFO_hit_UFO(ufo1_ptr, ufo2_ptr)){
-                 stage = Game_Fully_Over;
-                 break; 
-             }
-             break;
+                   stage = Game_Fully_Over;
+                   break; 
+               }
+               break;
 
-             case player2_dead:
-             player1_wins();
-             wait_for_vsync();
-             pixel_buffer_start = *(pixel_ctrl_ptr + 1);
-             break;
+               case player2_dead:
+               player1_wins();
+               wait_for_vsync();
+               pixel_buffer_start = *(pixel_ctrl_ptr + 1);
+               while(1){
+                for(int i=100; i<1000; i+=100){
+                    gensinSound(i, Audio_Array_Background);
+                    playsound(0, Audio_Array_Background);
+                }
+                for(int i=1000; i>=100; i-=100){
+                    gensinSound(i, Audio_Array_Background);
+                    playsound(0, Audio_Array_Background);
+                }
+                for(int i=1000; i>=100; i-=100){
+                    gensinSound(i, Audio_Array_Background);
+                    playsound(0, Audio_Array_Background);
+                } 
+            }
+            break;
 
-             case player1_dead:
-             player2_wins();
-             wait_for_vsync();
-             pixel_buffer_start = *(pixel_ctrl_ptr + 1);
-             break;
+            case player1_dead:
+            player2_wins();
+            wait_for_vsync();
+            pixel_buffer_start = *(pixel_ctrl_ptr + 1);
+            while(1){
+                for(int i=100; i<1000; i+=100){
+                    gensinSound(i, Audio_Array_Background);
+                    playsound(0, Audio_Array_Background);
+                }
+                for(int i=1000; i>=100; i-=100){
+                    gensinSound(i, Audio_Array_Background);
+                    playsound(0, Audio_Array_Background);
+                }
+                for(int i=1000; i>=100; i-=100){
+                    gensinSound(i, Audio_Array_Background);
+                    playsound(0, Audio_Array_Background);
+                } 
+            }
+            break;
 
-             case Game_Fully_Over:
-             draw_game_over(); 
-             wait_for_vsync();
-             pixel_buffer_start = *(pixel_ctrl_ptr + 1);
-             break;
+            case Game_Fully_Over:
+            draw_game_over(); 
+            wait_for_vsync();
+            pixel_buffer_start = *(pixel_ctrl_ptr + 1);
+            while(1){
+                for(int i=100; i<1000; i+=100){
+                    gensinSound(i, Audio_Array_Background);
+                    playsound(0, Audio_Array_Background);
+                }
+                for(int i=1000; i>=100; i-=100){
+                    gensinSound(i, Audio_Array_Background);
+                    playsound(0, Audio_Array_Background);
+                }
+                for(int i=1000; i>=100; i-=100){
+                    gensinSound(i, Audio_Array_Background);
+                    playsound(0, Audio_Array_Background);
+                } 
+            }
+            break;
 
-             default:
-             printf("error\n");
-         }
-     }
- }
+            default:
+            printf("error\n");
+        }
+    }
+}
 
 // code for subroutines (not shown)
- void plot_pixel(int x, int y, short int line_color) {
+void plot_pixel(int x, int y, short int line_color) {
   *(short int * )(pixel_buffer_start + (y << 10) + (x << 1)) = line_color;
 }
 
@@ -1683,6 +1730,15 @@ void wait_for_vsync() {
 
 void take_keyboardinput(char *keypressed){
     volatile int *PS2_ptr = (int *) 0xFF200100;
+    int Data = *PS2_ptr;
+    *keypressed = Data & 0xFF;
+    while(Data & 0x8000){
+        Data = * PS2_ptr;
+    }
+}
+
+void take_keyboard2input(char *keypressed){
+    volatile int *PS2_ptr = (int *) 0xFF200108;
     int Data = *PS2_ptr;
     *keypressed = Data & 0xFF;
     while(Data & 0x8000){
@@ -1936,3 +1992,5 @@ void clear_all_text(int x1, int y1, char a) {
         }
     }
 }
+//
+// random comments to reach 2000 mark lol 
