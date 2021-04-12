@@ -1361,6 +1361,7 @@ void add_screen();
 void draw_game_over();
 void player1_wins();
 void player2_wins(); 
+void reset_UFOs(UFO *ufo2_ptr, UFO *ufo1_ptr); 
 
 volatile int pixel_buffer_start; // global variable
 
@@ -1589,30 +1590,31 @@ int main(void)
                player1_wins();
                wait_for_vsync();
                pixel_buffer_start = *(pixel_ctrl_ptr + 1);
-               
-                take_keyboardinput(key_pressed_ptr);
-                if(key_pressed == 0x76){
-                    add_screen();
-                    wait_for_vsync();
-                    pixel_buffer_start = *(pixel_ctrl_ptr + 1);
-                    add_screen();
-                    start_screen = 0;
-                    stage = game;
+
+               take_keyboardinput(key_pressed_ptr);
+               if(key_pressed == 0x76){
+                reset_UFOs(ufo1_ptr, ufo2_ptr);  
+                add_screen();
+                wait_for_vsync();
+                pixel_buffer_start = *(pixel_ctrl_ptr + 1);
+                add_screen();
+                start_screen = 0;
+                stage = game;
+            }
+            else{
+                for(int i=100; i<1000; i+=100){
+                    gensinSound(i, Audio_Array_Background);
+                    playsound(0, Audio_Array_Background);
                 }
-                else{
-                    for(int i=100; i<1000; i+=100){
-                        gensinSound(i, Audio_Array_Background);
-                        playsound(0, Audio_Array_Background);
-                    }
-                    for(int i=1000; i>=100; i-=100){
-                        gensinSound(i, Audio_Array_Background);
-                        playsound(0, Audio_Array_Background);
-                    }
-                    for(int i=1000; i>=100; i-=100){
-                        gensinSound(i, Audio_Array_Background);
-                        playsound(0, Audio_Array_Background);
-                    } 
+                for(int i=1000; i>=100; i-=100){
+                    gensinSound(i, Audio_Array_Background);
+                    playsound(0, Audio_Array_Background);
                 }
+                for(int i=1000; i>=100; i-=100){
+                    gensinSound(i, Audio_Array_Background);
+                    playsound(0, Audio_Array_Background);
+                } 
+            }
             break;
 
             case player1_dead:
@@ -1625,28 +1627,29 @@ int main(void)
             wait_for_vsync();
             pixel_buffer_start = *(pixel_ctrl_ptr + 1);
             take_keyboardinput(key_pressed_ptr);
-                if(key_pressed == 0x76){
-                    add_screen();
-                    wait_for_vsync();
-                    pixel_buffer_start = *(pixel_ctrl_ptr + 1);
-                    add_screen();
-                    start_screen = 0;
-                    stage = game;
+            if(key_pressed == 0x76){
+               reset_UFOs(ufo1_ptr, ufo2_ptr);   
+                add_screen();
+                wait_for_vsync();
+                pixel_buffer_start = *(pixel_ctrl_ptr + 1);
+                add_screen();
+                start_screen = 0;
+                stage = game;
+            }
+            else{
+                for(int i=100; i<1000; i+=100){
+                    gensinSound(i, Audio_Array_Background);
+                    playsound(0, Audio_Array_Background);
                 }
-                else{
-                    for(int i=100; i<1000; i+=100){
-                        gensinSound(i, Audio_Array_Background);
-                        playsound(0, Audio_Array_Background);
-                    }
-                    for(int i=1000; i>=100; i-=100){
-                        gensinSound(i, Audio_Array_Background);
-                        playsound(0, Audio_Array_Background);
-                    }
-                    for(int i=1000; i>=100; i-=100){
-                        gensinSound(i, Audio_Array_Background);
-                        playsound(0, Audio_Array_Background);
-                    } 
+                for(int i=1000; i>=100; i-=100){
+                    gensinSound(i, Audio_Array_Background);
+                    playsound(0, Audio_Array_Background);
                 }
+                for(int i=1000; i>=100; i-=100){
+                    gensinSound(i, Audio_Array_Background);
+                    playsound(0, Audio_Array_Background);
+                } 
+            }
             break;
 
             case Game_Fully_Over:
@@ -1658,28 +1661,29 @@ int main(void)
             wait_for_vsync();
             pixel_buffer_start = *(pixel_ctrl_ptr + 1);
             take_keyboardinput(key_pressed_ptr);
-                if(key_pressed == 0x76){
-                    add_screen();
-                    wait_for_vsync();
-                    pixel_buffer_start = *(pixel_ctrl_ptr + 1);
-                    add_screen();
-                    start_screen = 0;
-                    stage = game;
+            if(key_pressed == 0x76){
+                reset_UFOs(ufo1_ptr, ufo2_ptr);  
+                add_screen();
+                wait_for_vsync();
+                pixel_buffer_start = *(pixel_ctrl_ptr + 1);
+                add_screen();
+                start_screen = 0;
+                stage = game;
+            }
+            else{
+                for(int i=100; i<1000; i+=100){
+                    gensinSound(i, Audio_Array_Background);
+                    playsound(0, Audio_Array_Background);
                 }
-                else{
-                    for(int i=100; i<1000; i+=100){
-                        gensinSound(i, Audio_Array_Background);
-                        playsound(0, Audio_Array_Background);
-                    }
-                    for(int i=1000; i>=100; i-=100){
-                        gensinSound(i, Audio_Array_Background);
-                        playsound(0, Audio_Array_Background);
-                    }
-                    for(int i=1000; i>=100; i-=100){
-                        gensinSound(i, Audio_Array_Background);
-                        playsound(0, Audio_Array_Background);
-                    } 
+                for(int i=1000; i>=100; i-=100){
+                    gensinSound(i, Audio_Array_Background);
+                    playsound(0, Audio_Array_Background);
                 }
+                for(int i=1000; i>=100; i-=100){
+                    gensinSound(i, Audio_Array_Background);
+                    playsound(0, Audio_Array_Background);
+                } 
+            }
             break;
 
             default:
@@ -1687,6 +1691,17 @@ int main(void)
         }
     }
 }
+
+void reset_UFOs(UFO *ufo2_ptr, UFO *ufo1_ptr){
+    ufo2_ptr->x = 100; 
+    ufo2_ptr->dx = 0; 
+    ufo2_ptr->y = 100; 
+    ufo2_ptr->dy = 0;  
+    ufo1_ptr->x = 100; 
+    ufo1_ptr->dx = 0; 
+    ufo1_ptr->y = 120; 
+    ufo1_ptr->dy = 0; 
+} 
 
 // code for subroutines (not shown)
 void plot_pixel(int x, int y, short int line_color) {
