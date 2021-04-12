@@ -1346,14 +1346,14 @@ void wait_for_vsync();
 void take_keyboardinput(char *keypressed);
 void draw_UFO1(UFO *ufo, short int line_color);
 void draw_UFO2(UFO *ufo, short int line_color);
-void update_location_UFO(UFO *ufo, char PS2Data, MISSILE *missile, volatile int *pixel_ctrl_ptr);
+void update_location_UFO(UFO *ufo, char Key_BoardData, MISSILE *missile, volatile int *pixel_ctrl_ptr);
 void clear_UFO(UFO *ufo); 
 void update_AI_location(UFO *ufo, int counter);
 void draw_missile(MISSILE *missile, short int line_color);
 void update_missile_location(MISSILE *missile);
 int check_hit(UFO *ufo, MISSILE *missile);
 void clear_Missile(MISSILE *missile); 
-void update_location_UFO2(UFO *ufo, char PS2Data, MISSILE *missile, volatile int *pixel_ctrl_ptr); 
+void update_location_UFO2(UFO *ufo, char Key_BoardData, MISSILE *missile, volatile int *pixel_ctrl_ptr); 
 void clear_all_text(int x1, int y1, char a);
 void draw_text(int x, int y, char str[]);
 void draw_ScreenChar(int x, int y, char letter);
@@ -1369,6 +1369,7 @@ volatile int pixel_buffer_start; // global variable
 
 #define BUF_SIZE 4000 
 #define pi 3.14159265
+#define FREQ_CONST 200
 
 int Audio_Array[4000] = {0};
 int Audio_Array2[4000] = {0};
@@ -1395,7 +1396,7 @@ void genSound_Explosion(int freq, int Audio_Array[]) {
         Audio_Array[i] = sin(discrete*i) * 100000000;
     }
     
-    discrete = ((freq+200)*pi*2) / 7000;
+    discrete = ((freq+FREQ_CONST)*pi*2) / 7000;
     for (int i = 0 ; i < 800; i++){
         Audio_Array[i+400] = sin(discrete*i) * 60000000;
     }
@@ -1495,27 +1496,9 @@ int main(void)
                 gensinSound(i, Audio_Array_Background);
                 playsound(0, Audio_Array_Background);
             }
-                            if(key_pressed == 0x5A && start_screen){
-                add_screen();
-                wait_for_vsync();
-                pixel_buffer_start = *(pixel_ctrl_ptr + 1);
-                add_screen();
-                start_screen = 0;
-                stage = game;
-                    //break;
-            }
             for(int i=1000; i>=100; i-=100){
                 gensinSound(i, Audio_Array_Background);
                 playsound(0, Audio_Array_Background);
-            }
-                            if(key_pressed == 0x5A && start_screen){
-                add_screen();
-                wait_for_vsync();
-                pixel_buffer_start = *(pixel_ctrl_ptr + 1);
-                add_screen();
-                start_screen = 0;
-                stage = game;
-                    //break;
             }
             for(int i=1000; i>=100; i-=100){
                 gensinSound(i, Audio_Array_Background);
@@ -1598,6 +1581,7 @@ int main(void)
                break;
 
                case player2_dead:
+               draw_ScreenChar(30, 3, '4');
                player1_wins();
                wait_for_vsync();
                pixel_buffer_start = *(pixel_ctrl_ptr + 1);
@@ -1618,6 +1602,7 @@ int main(void)
             break;
 
             case player1_dead:
+            draw_ScreenChar(68, 3, '4');
             player2_wins();
             wait_for_vsync();
             pixel_buffer_start = *(pixel_ctrl_ptr + 1);
@@ -1742,11 +1727,11 @@ void wait_for_vsync() {
 }
 
 void take_keyboardinput(char *keypressed){
-    volatile int *PS2_ptr = (int *) 0xFF200100;
-    int Data = *PS2_ptr;
+    volatile int *Key_Board_ptr = (int *) 0xFF200100;
+    int Data = *Key_Board_ptr;
     *keypressed = Data & 0xFF;
     while(Data & 0x8000){
-        Data = * PS2_ptr;
+        Data = * Key_Board_ptr;
     }
 }
 
@@ -1770,8 +1755,8 @@ void draw_UFO2(UFO *ufo, short int line_color){
     }
 }
 
-void update_location_UFO(UFO *ufo, char PS2Data, MISSILE *missile, volatile int *pixel_ctrl_ptr){
-    if(PS2Data == 0x29  && turn){
+void update_location_UFO(UFO *ufo, char Key_BoardData, MISSILE *missile, volatile int *pixel_ctrl_ptr){
+    if(Key_BoardData == 0x29  && turn){
         playsound(0, Audio_Array);
         MISSILE old_missile = {missile->x, missile->y, 0, 0};
         clear_Missile(&old_missile);
@@ -1804,22 +1789,22 @@ void update_location_UFO(UFO *ufo, char PS2Data, MISSILE *missile, volatile int 
         }
         turn = 0;
     }
-    else if(PS2Data == 0x74){
+    else if(Key_BoardData == 0x74){
         ufo->dx = 2;
         ufo->dy = 0;
         turn = 1;
     }
-    else if(PS2Data == 0x6B){
+    else if(Key_BoardData == 0x6B){
         ufo->dx = -2;
         ufo->dy = 0;
         turn = 1;
     }
-    else if(PS2Data == 0x72){
+    else if(Key_BoardData == 0x72){
         ufo->dy = 2;
         ufo->dx = 0;
         turn = 1;
     }
-    else if(PS2Data == 0x75){
+    else if(Key_BoardData == 0x75){
         ufo->dy = -2;
         ufo->dx = 0;
         turn = 1;
@@ -1836,8 +1821,8 @@ void update_location_UFO(UFO *ufo, char PS2Data, MISSILE *missile, volatile int 
     ufo->y += ufo->dy;
 }
 
-void update_location_UFO2(UFO *ufo, char PS2Data, MISSILE *missile, volatile int *pixel_ctrl_ptr){
-    if(PS2Data == 0x24  && turn){
+void update_location_UFO2(UFO *ufo, char Key_BoardData, MISSILE *missile, volatile int *pixel_ctrl_ptr){
+    if(Key_BoardData == 0x24  && turn){
         playsound(0, Audio_Array);
         MISSILE old_missile2 = {missile->x, missile->y, 0, 0};
         clear_Missile(&old_missile2);
@@ -1870,22 +1855,22 @@ void update_location_UFO2(UFO *ufo, char PS2Data, MISSILE *missile, volatile int
         }
         turn = 0;
     }
-    else if(PS2Data == 0x23){
+    else if(Key_BoardData == 0x23){
         ufo->dx = 2;
         ufo->dy = 0;
         turn = 1;
     }
-    else if(PS2Data == 0x1C){
+    else if(Key_BoardData == 0x1C){
         ufo->dx = -2;
         ufo->dy = 0;
         turn = 1;
     }
-    else if(PS2Data == 0x1B){
+    else if(Key_BoardData == 0x1B){
         ufo->dy = 2;
         ufo->dx = 0;
         turn = 1;
     }
-    else if(PS2Data == 0x1D){
+    else if(Key_BoardData == 0x1D){
         ufo->dy = -2;
         ufo->dx = 0;
         turn = 1;
@@ -1996,5 +1981,3 @@ void clear_all_text(int x1, int y1, char a) {
         }
     }
 }
-//
-// random comments to reach 2000 mark lol 
