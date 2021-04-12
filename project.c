@@ -1581,65 +1581,105 @@ int main(void)
                break;
 
                case player2_dead:
+               Array_Counter = 0;
+               Array_Counter2 = 0;
+               UFO1_Lives = 4;
+               UFO2_Lives = 4;
                draw_ScreenChar(30, 3, '4');
                player1_wins();
                wait_for_vsync();
                pixel_buffer_start = *(pixel_ctrl_ptr + 1);
-               while(1){
-                for(int i=100; i<1000; i+=100){
-                    gensinSound(i, Audio_Array_Background);
-                    playsound(0, Audio_Array_Background);
+               
+                take_keyboardinput(key_pressed_ptr);
+                if(key_pressed == 0x76){
+                    add_screen();
+                    wait_for_vsync();
+                    pixel_buffer_start = *(pixel_ctrl_ptr + 1);
+                    add_screen();
+                    start_screen = 0;
+                    stage = game;
                 }
-                for(int i=1000; i>=100; i-=100){
-                    gensinSound(i, Audio_Array_Background);
-                    playsound(0, Audio_Array_Background);
+                else{
+                    for(int i=100; i<1000; i+=100){
+                        gensinSound(i, Audio_Array_Background);
+                        playsound(0, Audio_Array_Background);
+                    }
+                    for(int i=1000; i>=100; i-=100){
+                        gensinSound(i, Audio_Array_Background);
+                        playsound(0, Audio_Array_Background);
+                    }
+                    for(int i=1000; i>=100; i-=100){
+                        gensinSound(i, Audio_Array_Background);
+                        playsound(0, Audio_Array_Background);
+                    } 
                 }
-                for(int i=1000; i>=100; i-=100){
-                    gensinSound(i, Audio_Array_Background);
-                    playsound(0, Audio_Array_Background);
-                } 
-            }
             break;
 
             case player1_dead:
+            Array_Counter = 0;
+            Array_Counter2 = 0;
+            UFO1_Lives = 4;
+            UFO2_Lives = 4;
             draw_ScreenChar(68, 3, '4');
             player2_wins();
             wait_for_vsync();
             pixel_buffer_start = *(pixel_ctrl_ptr + 1);
-            while(1){
-                for(int i=100; i<1000; i+=100){
-                    gensinSound(i, Audio_Array_Background);
-                    playsound(0, Audio_Array_Background);
+            take_keyboardinput(key_pressed_ptr);
+                if(key_pressed == 0x76){
+                    add_screen();
+                    wait_for_vsync();
+                    pixel_buffer_start = *(pixel_ctrl_ptr + 1);
+                    add_screen();
+                    start_screen = 0;
+                    stage = game;
                 }
-                for(int i=1000; i>=100; i-=100){
-                    gensinSound(i, Audio_Array_Background);
-                    playsound(0, Audio_Array_Background);
+                else{
+                    for(int i=100; i<1000; i+=100){
+                        gensinSound(i, Audio_Array_Background);
+                        playsound(0, Audio_Array_Background);
+                    }
+                    for(int i=1000; i>=100; i-=100){
+                        gensinSound(i, Audio_Array_Background);
+                        playsound(0, Audio_Array_Background);
+                    }
+                    for(int i=1000; i>=100; i-=100){
+                        gensinSound(i, Audio_Array_Background);
+                        playsound(0, Audio_Array_Background);
+                    } 
                 }
-                for(int i=1000; i>=100; i-=100){
-                    gensinSound(i, Audio_Array_Background);
-                    playsound(0, Audio_Array_Background);
-                } 
-            }
             break;
 
             case Game_Fully_Over:
+            Array_Counter = 0;
+            Array_Counter2 = 0;
+            UFO1_Lives = 4;
+            UFO2_Lives = 4;
             draw_game_over(); 
             wait_for_vsync();
             pixel_buffer_start = *(pixel_ctrl_ptr + 1);
-            while(1){
-                for(int i=100; i<1000; i+=100){
-                    gensinSound(i, Audio_Array_Background);
-                    playsound(0, Audio_Array_Background);
+            take_keyboardinput(key_pressed_ptr);
+                if(key_pressed == 0x76){
+                    add_screen();
+                    wait_for_vsync();
+                    pixel_buffer_start = *(pixel_ctrl_ptr + 1);
+                    add_screen();
+                    start_screen = 0;
+                    stage = game;
                 }
-                for(int i=1000; i>=100; i-=100){
-                    gensinSound(i, Audio_Array_Background);
-                    playsound(0, Audio_Array_Background);
+                else{
+                    for(int i=100; i<1000; i+=100){
+                        gensinSound(i, Audio_Array_Background);
+                        playsound(0, Audio_Array_Background);
+                    }
+                    for(int i=1000; i>=100; i-=100){
+                        gensinSound(i, Audio_Array_Background);
+                        playsound(0, Audio_Array_Background);
+                    }
+                    for(int i=1000; i>=100; i-=100){
+                        gensinSound(i, Audio_Array_Background);
+                        playsound(0, Audio_Array_Background);
+                    } 
                 }
-                for(int i=1000; i>=100; i-=100){
-                    gensinSound(i, Audio_Array_Background);
-                    playsound(0, Audio_Array_Background);
-                } 
-            }
             break;
 
             default:
