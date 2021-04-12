@@ -1346,14 +1346,14 @@ void wait_for_vsync();
 void take_keyboardinput(char *keypressed);
 void draw_UFO1(UFO *ufo, short int line_color);
 void draw_UFO2(UFO *ufo, short int line_color);
-void update_location_UFO(UFO *ufo, char Key_BoardData, MISSILE *missile, volatile int *pixel_ctrl_ptr);
+void update_location_UFO(UFO *ufo, char Key_BoardData, MISSILE *missile, volatile int *pixel_ctrl_ptr, int speed);
 void clear_UFO(UFO *ufo); 
 void update_AI_location(UFO *ufo, int counter);
 void draw_missile(MISSILE *missile, short int line_color);
 void update_missile_location(MISSILE *missile);
 int check_hit(UFO *ufo, MISSILE *missile);
 void clear_Missile(MISSILE *missile); 
-void update_location_UFO2(UFO *ufo, char Key_BoardData, MISSILE *missile, volatile int *pixel_ctrl_ptr); 
+void update_location_UFO2(UFO *ufo, char Key_BoardData, MISSILE *missile, volatile int *pixel_ctrl_ptr, int speed2); 
 void clear_all_text(int x1, int y1, char a);
 void draw_text(int x, int y, char str[]);
 void draw_ScreenChar(int x, int y, char letter);
@@ -1436,6 +1436,8 @@ int main(void)
     volatile int *HEX_PTR2 = (int *)0xff200030;
     genSound_Missile(400, Audio_Array);
     genSound_Explosion(400, Audio_Array2); 
+    int speed = 5; 
+    int speed2 = 5; 
     
     // declare other variables(not shown)
     // initialize location and direction of rectangles(not shown)
@@ -1528,13 +1530,36 @@ int main(void)
         take_keyboardinput(key_pressed_ptr);
         draw_UFO1(ufo1_ptr, GREEN);
         draw_UFO2(ufo2_ptr, RED);
-        update_location_UFO(ufo1_ptr, key_pressed, missile1_ptr, pixel_ctrl_ptr);
-        update_location_UFO2(ufo2_ptr, key_pressed, missile2_ptr, pixel_ctrl_ptr);
+        update_location_UFO(ufo1_ptr, key_pressed, missile1_ptr, pixel_ctrl_ptr, speed);
+        update_location_UFO2(ufo2_ptr, key_pressed, missile2_ptr, pixel_ctrl_ptr, speed2);
 
-                //update_AI_location(ufo2_ptr, counter);
+        //update_AI_location(ufo2_ptr, counter);
+        if(Array_Counter==0){
         draw_missile(missile1_ptr, ORANGE);
+        }
+        else if(Array_Counter==1){
+        draw_missile(missile1_ptr, YELLOW);
+        }
+        else if(Array_Counter==2){
+        draw_missile(missile1_ptr, GREEN);
+        }
+        else if(Array_Counter==3){
+        draw_missile(missile1_ptr, BLUE);
+        }
+
         update_missile_location(missile1_ptr);
+        if(Array_Counter2==0){
         draw_missile(missile2_ptr, CYAN);
+        }
+        else if(Array_Counter2==1){
+        draw_missile(missile2_ptr, RED);
+        }
+        else if(Array_Counter2==2){
+        draw_missile(missile2_ptr, MAGENTA);
+        }
+        else if(Array_Counter2==3){
+        draw_missile(missile2_ptr, WHITE);
+        }
         update_missile_location(missile2_ptr);
         draw_ScreenChar(30, 3, NumberArray[Array_Counter]);
         draw_ScreenChar(68, 3, NumberArray[Array_Counter2]);
@@ -1549,6 +1574,7 @@ int main(void)
                 }
                 if(check_hit(ufo2_ptr, missile1_ptr)){
                     UFO2_Lives-=1; 
+                    speed = speed + 1; 
                     if(UFO2_Lives==0){
                         stage = player2_dead;
                     }
@@ -1563,6 +1589,7 @@ int main(void)
                 }
                 if(check_hit(ufo1_ptr, missile2_ptr)){
                     UFO1_Lives-=1; 
+                    speed2 = speed2 + 1; 
                     if(UFO1_Lives==0){
                         stage = player1_dead;
                     }
@@ -1818,7 +1845,7 @@ void draw_UFO2(UFO *ufo, short int line_color){
     }
 }
 
-void update_location_UFO(UFO *ufo, char Key_BoardData, MISSILE *missile, volatile int *pixel_ctrl_ptr){
+void update_location_UFO(UFO *ufo, char Key_BoardData, MISSILE *missile, volatile int *pixel_ctrl_ptr, int speed){
     if(Key_BoardData == 0x29  && turn){
         playsound(0, Audio_Array);
         MISSILE old_missile = {missile->x, missile->y, 0, 0};
@@ -1831,20 +1858,20 @@ void update_location_UFO(UFO *ufo, char Key_BoardData, MISSILE *missile, volatil
         missile->x = ufo->x;
         missile->y = ufo->y;
         if(ufo->dx > 0){
-            missile->dx = 7;
+            missile->dx = speed;
             missile->dy = 0; 
         }
         else if(ufo->dx < 0){
-            missile->dx = -7;
+            missile->dx = -speed;
             missile->dy = 0;
         }
         else if(ufo->dy > 0){
             missile->dx = 0;
-            missile->dy = 7;
+            missile->dy = speed;
         }
         else if(ufo->dy < 0){
             missile->dx = 0;
-            missile->dy = -7;
+            missile->dy = -speed;
         }
         else{
             missile->dx = 0;
@@ -1884,7 +1911,7 @@ void update_location_UFO(UFO *ufo, char Key_BoardData, MISSILE *missile, volatil
     ufo->y += ufo->dy;
 }
 
-void update_location_UFO2(UFO *ufo, char Key_BoardData, MISSILE *missile, volatile int *pixel_ctrl_ptr){
+void update_location_UFO2(UFO *ufo, char Key_BoardData, MISSILE *missile, volatile int *pixel_ctrl_ptr, int speed2){
     if(Key_BoardData == 0x24  && turn){
         playsound(0, Audio_Array);
         MISSILE old_missile2 = {missile->x, missile->y, 0, 0};
@@ -1897,20 +1924,20 @@ void update_location_UFO2(UFO *ufo, char Key_BoardData, MISSILE *missile, volati
         missile->x = ufo->x;
         missile->y = ufo->y;
         if(ufo->dx > 0){
-            missile->dx = 7;
+            missile->dx = speed2;
             missile->dy = 0; 
         }
         else if(ufo->dx < 0){
-            missile->dx = -7;
+            missile->dx = -speed2;
             missile->dy = 0;
         }
         else if(ufo->dy > 0){
             missile->dx = 0;
-            missile->dy = 7;
+            missile->dy = speed2;
         }
         else if(ufo->dy < 0){
             missile->dx = 0;
-            missile->dy = -7;
+            missile->dy = -speed2;
         }
         else{
             missile->dx = 0;
