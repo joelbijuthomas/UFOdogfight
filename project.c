@@ -1587,6 +1587,8 @@ int main(void)
                UFO2_Lives = 4;
                draw_ScreenChar(30, 3, '4');
                player1_wins();
+               char player2_dead_text[] = "Press esc to restart";
+               draw_text(32,46,player2_dead_text);
                wait_for_vsync();
                pixel_buffer_start = *(pixel_ctrl_ptr + 1);
                
@@ -1622,6 +1624,8 @@ int main(void)
             UFO2_Lives = 4;
             draw_ScreenChar(68, 3, '4');
             player2_wins();
+            char player1_dead_text[] = "Press esc to restart";
+            draw_text(32,46,player1_dead_text);
             wait_for_vsync();
             pixel_buffer_start = *(pixel_ctrl_ptr + 1);
             take_keyboardinput(key_pressed_ptr);
@@ -1654,7 +1658,9 @@ int main(void)
             Array_Counter2 = 0;
             UFO1_Lives = 4;
             UFO2_Lives = 4;
-            draw_game_over(); 
+            draw_game_over();
+            char game_over_text[] = "Press esc to restart";
+            draw_text(32,46,game_over_text); 
             wait_for_vsync();
             pixel_buffer_start = *(pixel_ctrl_ptr + 1);
             take_keyboardinput(key_pressed_ptr);
