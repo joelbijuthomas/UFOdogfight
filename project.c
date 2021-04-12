@@ -1365,9 +1365,9 @@ void player2_wins();
 volatile int pixel_buffer_start; // global variable
 
 #define AUDIO_BASE            0xFF203040
+#define BUFFER_BASE           0xc9000000
 
 #define BUF_SIZE 4000 
-#define BUF_THRESHOLD 96 
 #define pi 3.14159265
     
 int s1[4000] = {0};
@@ -1402,7 +1402,7 @@ void genSound_Explosion(int freq, int s1[]) {
 void playsound(long int buffer_index, int s1[]){
     volatile int* audio_ptr = (int*)AUDIO_BASE;
     int fifospace =*(audio_ptr + 1); 
-                while ((fifospace & 0x00FF0000) && (buffer_index < BUF_SIZE)) {
+                while ((fifospace & 0x00FF0000) && (buffer_index < 4000)) {
                     *(audio_ptr + 2) = s1[buffer_index];
                     *(audio_ptr + 3) = s1[buffer_index];
                     ++buffer_index;
@@ -1936,7 +1936,7 @@ void draw_string(int x, int y, char str[]) {
 }
 
 void draw_char(int x, int y, char letter) {
-    volatile int charBuffer = 0xc9000000;
+    volatile int charBuffer = BUFFER_BASE;
     *(char *)(charBuffer + (y << 7) + x) = letter;
 }
 
