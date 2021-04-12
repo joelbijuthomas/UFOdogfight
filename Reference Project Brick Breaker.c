@@ -1436,8 +1436,8 @@ int main(void)
     volatile int *HEX_PTR2 = (int *)0xff200030;
     genSound_Missile(400, Audio_Array);
     genSound_Explosion(400, Audio_Array2); 
-    int speed = 5; 
-    int speed2 = 5; 
+    int speed = 7; 
+    int speed2 = 7; 
     
     // declare other variables(not shown)
     // initialize location and direction of rectangles(not shown)
@@ -1574,7 +1574,6 @@ int main(void)
                 }
                 if(check_hit(ufo2_ptr, missile1_ptr)){
                     UFO2_Lives-=1; 
-                    speed = speed + 1; 
                     if(UFO2_Lives==0){
                         stage = player2_dead;
                     }
@@ -1589,7 +1588,6 @@ int main(void)
                 }
                 if(check_hit(ufo1_ptr, missile2_ptr)){
                     UFO1_Lives-=1; 
-                    speed2 = speed2 + 1; 
                     if(UFO1_Lives==0){
                         stage = player1_dead;
                     }
@@ -1615,7 +1613,7 @@ int main(void)
              UFO2_Lives = 4;
              draw_ScreenChar(30, 3, '4');
              player1_wins();
-			 char player2_dead_text[] = "Press esc to restart";
+             char player2_dead_text[] = "Press esc to restart";
              draw_text(32,46,player2_dead_text);
              wait_for_vsync();
              pixel_buffer_start = *(pixel_ctrl_ptr + 1);
@@ -1653,7 +1651,7 @@ int main(void)
             UFO2_Lives = 4;
             draw_ScreenChar(68, 3, '4');
             player2_wins();
-			char player1_dead_text[] = "Press esc to restart";
+            char player1_dead_text[] = "Press esc to restart";
             draw_text(32,46,player1_dead_text);
             wait_for_vsync();
             pixel_buffer_start = *(pixel_ctrl_ptr + 1);
@@ -1689,7 +1687,7 @@ int main(void)
         UFO1_Lives = 4;
         UFO2_Lives = 4;
         draw_game_over(); 
-		char game_over_text[] = "Press esc to restart";
+        char game_over_text[] = "Press esc to restart";
         draw_text(32,46,game_over_text); 
         wait_for_vsync();
         pixel_buffer_start = *(pixel_ctrl_ptr + 1);
@@ -1905,10 +1903,10 @@ void update_location_UFO(UFO *ufo, char Key_BoardData, MISSILE *missile, volatil
         ufo->dx = 0;
         turn = 1;
     }
-    if(ufo->x < 23  || ufo->x > 295){
+    if(ufo->x < 25  || ufo->x > 290){
         ufo->dx = -ufo->dx;
     }
-    else if(ufo->y < 23 || ufo->y > 218){            //These lines have to be changed.
+    else if(ufo->y < 25 || ufo->y > 215){            //These lines have to be changed.
         ufo->dy = -ufo->dy;
     }
     ufo->x += ufo->dx;
@@ -1971,10 +1969,10 @@ void update_location_UFO2(UFO *ufo, char Key_BoardData, MISSILE *missile, volati
         ufo->dx = 0;
         turn = 1;
     }
-    if(ufo->x < 23  || ufo->x > 295){
+    if(ufo->x < 25  || ufo->x > 290){
         ufo->dx = -ufo->dx;
     }
-    else if(ufo->y < 23 || ufo->y > 218){            //These lines have to be changed.
+    else if(ufo->y < 25 || ufo->y > 215){            //These lines have to be changed.
         ufo->dy = -ufo->dy;
     }
     ufo->x += ufo->dx;
@@ -2016,10 +2014,10 @@ void draw_missile(MISSILE *missile, short int line_color){
 }
 
 void update_missile_location(MISSILE *missile){
-    if(missile->x < 23  || missile->x > 295){
+    if(missile->x < 25  || missile->x > 290){
         missile->dx = -missile->dx;
     }
-    else if(missile->y < 23 || missile->y > 218){
+    else if(missile->y < 25 || missile->y > 215){
         missile->dy = -missile->dy;
     }
     missile->x += missile->dx;
