@@ -1343,7 +1343,7 @@ void draw_line(int x0, int y0, int x1, int y1, short int line_color);
 void plot_pixel(int x, int y, short int line_color); 
 void swap(int *x, int *y);
 void wait_for_vsync();
-void keyboard_input(char *keypressed);
+void take_keyboardinput(char *keypressed);
 void draw_UFO1(UFO *ufo, short int line_color);
 void draw_UFO2(UFO *ufo, short int line_color);
 void update_location_UFO(UFO *ufo, char PS2Data, MISSILE *missile, volatile int *pixel_ctrl_ptr);
@@ -1402,10 +1402,10 @@ void genSound_Explosion(int freq, int Audio_Array[]) {
 void playsound(long int Audio_Buffer_index, int Audio_Array[]){
     volatile int* audio_ptr = (int*)AUDIO_BASE;
     int fifospace =*(audio_ptr + 1); 
-                while ((fifospace & 0x00FF0000) && (buffer_index < 4000)) {
+                while ((fifospace & 0x00FF0000) && (Audio_Buffer_index < 4000)) {
                     *(audio_ptr + 2) = Audio_Array[Audio_Buffer_index];
                     *(audio_ptr + 3) = Audio_Array[Audio_Buffer_index];
-                    buffer_index = buffer_index + 1;
+                    Audio_Buffer_index = Audio_Buffer_index + 1;
             }
         }
 
@@ -1465,7 +1465,7 @@ int main(void)
                 //pixel_buffer_start = *(pixel_ctrl_ptr + 1);
                 char entry_text[] = "Press enter to start";
                 draw_text(32,28,entry_text);
-                keyboard_input(key_pressed_ptr);
+                take_keyboardinput(key_pressed_ptr);
                 if(key_pressed == 0x5A && start_screen){
                     add_screen();
                     wait_for_vsync();
@@ -1494,7 +1494,7 @@ int main(void)
                 clear_Missile(missile1_ptr);
                 clear_Missile(missile2_ptr);
                 
-                keyboard_input(key_pressed_ptr);
+                take_keyboardinput(key_pressed_ptr);
                 draw_UFO1(ufo1_ptr, GREEN);
                 draw_UFO2(ufo2_ptr, RED);
                 update_location_UFO(ufo1_ptr, key_pressed, missile1_ptr, pixel_ctrl_ptr);
@@ -1652,7 +1652,7 @@ void wait_for_vsync() {
     status = *(pixel_ctrl_ptr + 3); 
 }
 
-void keyboard_input(char *keypressed){
+void take_keyboardinput(char *keypressed){
     volatile int *PS2_ptr = (int *) 0xFF200100;
     int Data = *PS2_ptr;
     *keypressed = Data & 0xFF;
