@@ -1,4 +1,3 @@
-Project final.c
 /* This files provides address values that exist in the system */
 
 #define SDRAM_BASE            0xC0000000
